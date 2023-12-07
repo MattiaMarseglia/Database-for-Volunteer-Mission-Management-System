@@ -52,6 +52,6 @@ Please follow the guidelines below to interact with the database:
    - Generate reports to assess mission success, personnel involvement, and emergency response effectiveness.
 
 ## More Information
-For more detailed information [here](Relazione-Basi-di-Dati-I-Z--Gruppo-12.pdf)
+For more detailed information [here](https://github.com/MattiaMarseglia/Volunteer-Mission-Management-System/blob/main/Relazione%20Basi%20di%20Dati%20I-Z%20Gruppo%2012.pdf)
 
 Feel free to reach out for any clarifications or suggestions. Thank you for your contribution to the "Medici Senza Frontiere" Database Project!
