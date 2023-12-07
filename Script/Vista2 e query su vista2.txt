@@ -1,0 +1,38 @@
+
+--VISTA: Emergenze_missioni
+
+CREATE VIEW Emergenze_missioni AS
+SELECT E.nome as emergenza, E.codice_emergenza, S.luogo_di_appartenenza AS area_interessata, M.codice_missione AS missione_organizzata, R.costo_totale AS costo_missione, R.successo_o_insuccesso AS successo_missione
+FROM emergenza E JOIN missione M ON E.codice_emergenza = M.emergenza
+JOIN report R ON M.codice_missione = R.missione
+JOIN svolgimento S on S.missione = M.codice_missione;
+
+
+
+--POSSIBILI QUERY SULLA VISTA:
+
+
+--Costi totali per emergenza
+
+SELECT emergenza, area_interessata, sum(costo_missione) AS costo_totale
+FROM Emergenze_missioni
+GROUP BY Emergenza, area_interessata
+ORDER BY area_interessata;
+
+
+
+--Successo ottenuto nelle emergenze
+
+SELECT Emergenza, ROUND(sum(successo_missione)/count(missione_organizzata),2) AS successo_medio_ottenuto
+FROM Emergenze_missioni
+GROUP BY Emergenza
+ORDER BY successo_medio_ottenuto ASC;
+
+
+
+
+--Numero emergenze per area geografica
+
+SELECT area_interessata, count(DISTINCT emergenza) AS numero_emergenze
+FROM Emergenze_missioni
+GROUP BY area_interessata;

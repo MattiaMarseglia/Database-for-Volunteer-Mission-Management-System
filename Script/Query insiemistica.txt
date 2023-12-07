@@ -1,0 +1,27 @@
+/* QUERY 3:
+	Stampa le informazioni sulle missioni in corso che fronteggiano un'emergenza di gravità >= 5 */
+
+SELECT 
+	M.emergenza, 
+	M.codice_missione, 
+	M.descrizione, 
+	M.data_di_inizio, 
+	M.num_membri_coinvolti
+FROM 
+	missione as M,emergenza as eme
+WHERE 
+	M.emergenza = eme.codice_emergenza
+	and eme.gravità > 5	
+
+except
+
+SELECT 
+	M.emergenza, 
+	M.codice_missione, 
+	M.descrizione, 
+	M.data_di_inizio, 
+	M.num_membri_coinvolti
+FROM 
+	missione AS M, report AS r
+WHERE 
+	m.codice_missione = r.missione;

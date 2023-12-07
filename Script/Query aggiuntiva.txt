@@ -1,0 +1,17 @@
+/* 	QUERY 4:
+	Stampa per ogni sezione le tipologie di dipendenti che la compongono, e di questi:
+		1)il numero
+		2)le spese totali per la tipologia */
+
+SELECT
+	sezione.sede,
+	coalesce(membro.professione, 'nessun professionista presente'),
+	count(membro.professione) as numero ,
+	coalesce(sum(dipendente.stipendio) , 0) as spese_totali
+FROM 
+	membro JOIN dipendente on membro.codice_membro = dipendente.codice_membro 
+	RIGHT JOIN sezione on membro.sezione = sezione.sede
+GROUP BY 
+	sezione.sede, membro.professione
+ORDER BY 
+	sezione.sede;

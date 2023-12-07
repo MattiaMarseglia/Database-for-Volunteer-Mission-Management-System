@@ -1,0 +1,107 @@
+
+--TRIGGER present_to_past_esplorativa
+
+CREATE OR REPLACE FUNCTION present_to_past_esplorativa()
+RETURNS TRIGGER AS
+$BODY$
+	DECLARE
+		t positive_integer;
+	BEGIN
+		IF( NEW.missione IN (SELECT missione FROM missione_esplorativa)) THEN
+			SELECT ME.team INTO t FROM missione_esplorativa ME JOIN report R ON ME.missione=R.missione WHERE R.missione=new.missione;
+			DELETE FROM partecipazione_corrente WHERE partecipazione_corrente.team=t;
+		END IF;
+		RETURN NEW;
+	END;
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER present_to_past_esplorativa
+AFTER INSERT
+ON REPORT
+FOR EACH ROW
+EXECUTE PROCEDURE present_to_past_esplorativa();
+
+
+
+
+--TRIGGER present_to_past_before
+
+CREATE OR REPLACE FUNCTION present_to_past_before()
+RETURNS TRIGGER AS
+$BODY$
+	BEGIN
+		IF( NOT EXISTS( SELECT RC.team, RC.missione_di_campo, RC.data_inizio_attività
+				FROM realizzazione_corrente RC
+				WHERE RC.team=NEW.team AND RC.missione_di_campo=NEW.missione_di_campo AND RC.data_inizio_attività=NEW.data_inizio_attività)
+		  ) THEN
+			RAISE EXCEPTION $$'impossibile aggiungere una realizzazione passata per il team % perchè non ha alcuna realizzazione corrente coincidente con la data di inizio e destinata alla specifica missione'$$, new.team;
+		ELSE RETURN NEW;
+		END IF;
+	END;	
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER present_to_past_before
+BEFORE INSERT
+ON realizzazione_passata
+FOR EACH ROW
+EXECUTE PROCEDURE present_to_past_before();
+
+
+
+
+--TRIGGER present_to_past
+
+CREATE OR REPLACE FUNCTION present_to_past()
+RETURNS TRIGGER AS
+$BODY$
+	BEGIN
+		DELETE FROM realizzazione_corrente WHERE realizzazione_corrente.team=NEW.team;
+		DELETE FROM partecipazione_corrente WHERE partecipazione_corrente.team=NEW.team;
+		RETURN NEW;
+	END;
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER present_to_past
+AFTER INSERT
+ON realizzazione_passata
+FOR EACH ROW
+EXECUTE PROCEDURE present_to_past();
+
+
+
+
+--TRIGGER partecipazione_present_to_past
+
+CREATE OR REPLACE FUNCTION partecipazione_present_to_past()
+RETURNS TRIGGER AS
+$BODY$
+	DECLARE
+		c date;
+	BEGIN
+		IF( OLD.team IN (SELECT team FROM missione_esplorativa)) THEN
+			SELECT R.data_fine_effettiva INTO c FROM report R JOIN missione_esplorativa ME ON R.missione=ME.missione WHERE ME.team=OLD.team;
+			INSERT INTO partecipazione_passata VALUES (old.data_inizio, old.membro, old.team, c);
+		ELSE
+			IF( OLD.team IN(SELECT team FROM realizzazione_passata)) THEN
+				SELECT data_fine_attività INTO c FROM realizzazione_passata WHERE realizzazione_passata.team=OLD.team;
+				INSERT INTO partecipazione_passata VALUES(old.data_inizio, old.membro, old.team, c);
+			END IF;
+		END IF;
+		RETURN OLD;
+	END;
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER partecipazione_present_to_past
+AFTER DELETE
+ON partecipazione_corrente
+FOR EACH ROW
+EXECUTE PROCEDURE partecipazione_present_to_past();
+

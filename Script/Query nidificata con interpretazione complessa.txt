@@ -1,0 +1,21 @@
+/* QUERY 2:
+	Stampa per ciascuna sezione,
+		1)il numero dei membri afferenti,
+		2)tra tutti i membri afferenti, i dati dei membri attualmente in missione con il relativo team a cui partecipano */
+
+SELECT DISTINCT
+	S.sede AS sezione,
+	S.numero_membri as numero_membri_afferenti,
+	M.nome AS nome_membro_in_missione,
+	M.professione,
+	M.national_identity_number,
+	T.codice_team AS team_a_cui_partecipa
+FROM
+	sezione AS S,membro AS M,team AS T
+WHERE
+	S.sede=M.sezione
+and EXISTS (SELECT * 
+			FROM partecipazione_corrente as PC
+			WHERE M.codice_membro=PC.membro and T.codice_team = PC.team)
+ORDER BY 
+	S.sede;

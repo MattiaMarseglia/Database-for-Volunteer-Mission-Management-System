@@ -1,0 +1,46 @@
+
+--TRIGGER check_professione_dipendenti
+
+CREATE OR REPLACE FUNCTION check_professione_dipendenti() RETURNS TRIGGER AS
+$BODY$
+	DECLARE
+		c varchar(30);
+	BEGIN
+		SELECT professione INTO c FROM membro WHERE membro.codice_membro=NEW.codice_membro;
+		IF( c<>'dottore' AND c<>'infermiere' AND c<>'figura medica' AND c<>'esperto logistico' AND c<>'ingegnere' AND c<>'amministratore') THEN
+			RAISE EXCEPTION 'Il dipendente che vuoi inserire non svolge una professione adeguata per il suo ruolo';
+		END IF;
+		RETURN NEW;
+	END;
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER check_professione_dipendenti
+BEFORE INSERT ON dipendente
+FOR EACH ROW
+EXECUTE PROCEDURE check_professione_dipendenti();
+
+
+
+
+--TRIGGER check_professione
+
+CREATE OR REPLACE FUNCTION check_professione() RETURNS TRIGGER AS
+$BODY$
+	BEGIN
+		IF( NEW.codice_membro IN (SELECT codice_membro FROM dipendente)) THEN
+			IF( NEW.professione<>'dottore' AND NEW.professione<>'infermiere' AND NEW.professione<>'figura medica' AND NEW.professione<>'esperto logistico' AND NEW.professione<>'ingegnere' AND NEW.professione<>'amministratore') THEN
+				RAISE EXCEPTION $$'La professione che stai inserendo al membro % non è adeguata in quanto è un dipendente'$$,NEW.codice_membro;
+			END IF;
+		END IF;
+		RETURN NEW;
+	END;
+$BODY$
+LANGUAGE PLPGSQL;
+
+
+CREATE TRIGGER check_professione
+BEFORE UPDATE OF professione ON membro
+FOR EACH ROW
+EXECUTE PROCEDURE check_professione();

@@ -1,0 +1,1148 @@
+drop table if exists emergenza, missione, luogo, coinvolgimento, luogo_specifico , svolgimento , 
+report,evento_saliente, missione_di_campo , sezione, membro , domicilio , recapito , qualifica ,
+specializzazione , dipendente , volontario,capo_missione , team , coordinamento , 
+partecipazione_corrente , partecipazione_passata , ferimento , decesso, realizzazione_corrente, 
+realizzazione_passata , missione_esplorativa , autorizzazione;
+drop domain if exists positive_integer cascade;
+
+create domain positive_integer as integer check(value  > 0);
+
+create table emergenza(
+	codice_emergenza positive_integer Primary Key,
+	nome varchar(30) NOT NULL UNIQUE,
+	descrizione varchar(200) NOT NULL,
+	data_di_inizio date,
+	data_di_fine date,
+	gravità numeric(1,0) NOT NULL,
+	check (data_di_fine > data_di_inizio),
+	check(gravità > 0 )
+);
+
+create table missione (
+	codice_missione positive_integer Primary Key,
+	data_di_inizio date NOT NULL,
+	data_fine_presunta date NOT NULL,
+	descrizione varchar(200) NOT NULL,
+	num_membri_coinvolti integer NOT NULL default 0,
+	emergenza positive_integer references emergenza on delete restrict on update cascade NOT NULL,
+	check (data_fine_presunta > data_di_inizio),
+	check(num_membri_coinvolti >= 0 )
+);
+
+create table luogo (
+	nome varchar(20) Primary Key
+);
+
+create table coinvolgimento (
+	emergenza positive_integer references emergenza on delete restrict on update cascade,
+	luogo varchar(20) references luogo on delete restrict on update restrict,
+	primary key (emergenza, luogo)
+);
+
+create table luogo_specifico(
+	nome varchar(20),
+	luogo_di_appartenenza varchar(20) references luogo on delete restrict on update restrict,
+	primary key (nome, luogo_di_appartenenza)
+);
+
+create table svolgimento(
+	luogo_specifico varchar(20),
+	luogo_di_appartenenza varchar(20),
+	missione positive_integer references missione on delete restrict on update cascade,
+	foreign key (luogo_specifico, luogo_di_appartenenza) 
+	references luogo_specifico(nome,luogo_di_appartenenza) on delete restrict on update restrict,
+	primary key (luogo_specifico, luogo_di_appartenenza, missione)
+);
+
+create table report(
+	missione positive_integer  primary key references missione on delete restrict on update cascade,
+	costo_totale numeric(8,2) NOT NULL,
+	successo_o_insuccesso numeric(1,0) NOT NULL,
+	motivazione_variazione_data varchar(100),
+	data_fine_effettiva date NOT NULL,
+	check (costo_totale > 0 ),
+	check (successo_o_insuccesso >= 0)
+);
+
+create table evento_saliente(
+	codice_evento serial primary key,
+	nome varchar(100) NOT NULL,
+	missione positive_integer references report on delete restrict on update cascade NOT NULL
+);
+
+create table missione_di_campo(
+	missione positive_integer primary key references missione on delete restrict on update cascade,
+	obiettivo varchar(30) NOT NULL,
+	tipologia varchar(30) NOT NULL,
+	valutazione_rischio numeric(1,0) NOT NULL,
+	check (valutazione_rischio >= 0 )
+);
+
+create table sezione(
+	sede varchar(30) primary key,
+	numero_di_uffici positive_integer NOT NULL ,
+	numero_membri integer NOT NULL default 0 ,
+	check (numero_membri >= 0 )
+);
+
+create table membro (
+	codice_membro positive_integer primary key,
+	national_identity_number varchar(25) NOT NULL UNIQUE,
+	professione varchar(30) NOT NULL,
+	nome varchar(30) NOT NULL,
+	cognome varchar(30) NOT NULL,
+	data_di_nascita date NOT NULL,
+	Via varchar(30),
+	Civico varchar(5),
+	CAP varchar(15),
+	sezione varchar(30) references sezione on delete restrict on update cascade NOT NULL
+);
+
+create table domicilio (
+	codice_domicilio positive_integer primary key,
+	Via varchar(30) NOT NULL,
+	Civico varchar(5) NOT NULL,
+	CAP varchar(15) NOT NULL,
+	UNIQUE (Via,Civico,CAP)
+);
+
+create table recapito(
+	membro positive_integer references membro on delete restrict on update cascade,
+	domicilio positive_integer references domicilio on delete cascade on update cascade,
+	primary key (membro, domicilio)
+);
+
+create table qualifica (
+	titolo varchar(30) primary key
+);
+
+create table specializzazione (
+	membro positive_integer references membro on delete restrict on update cascade,
+	qualifica varchar(30) references qualifica on delete cascade on update cascade,
+	primary key (membro, qualifica)
+	
+);
+
+create table dipendente(
+	codice_membro positive_integer primary key references membro 
+	on delete cascade on update cascade,
+	stipendio numeric(7,2) NOT NULL default 0, 
+	anni_di_servizio positive_integer default 0 ,
+	check (stipendio>0)
+);
+
+create table volontario(
+	codice_membro positive_integer primary key references membro 
+	on delete restrict on update cascade,
+	data_inizio_disponibilità date NOT NULL,
+	data_fine_disponibilità date NOT NULL,
+	check (data_fine_disponibilità > data_inizio_disponibilità)
+);
+
+create table capo_missione(
+	dipendente positive_integer primary key references dipendente 
+	on delete restrict on update cascade
+);
+
+create table team(
+	codice_team positive_integer primary key,
+	capo_missione positive_integer references capo_missione 
+	on delete restrict on update cascade NOT NULL
+);
+
+create table coordinamento(
+	team positive_integer references team  on delete restrict on update cascade,
+	membro positive_integer references membro  on delete restrict on update cascade,
+	tipo varchar(30) NOT NULL,
+	primary key (team,membro)
+);
+
+create table partecipazione_corrente(
+	data_inizio date,
+	membro positive_integer references membro on delete restrict on update cascade,
+	team positive_integer references team on delete restrict on update cascade,
+	primary key (data_inizio,membro)
+	
+);
+
+create table partecipazione_passata(
+	data_inizio date,
+	membro positive_integer references membro on delete restrict on update cascade,
+	team positive_integer references team on delete restrict on update cascade,
+	data_fine date NOT NULL,
+	primary key (data_inizio,membro),
+	check (data_fine > data_inizio)
+);
+
+create table ferimento(
+	codice_ferimento serial primary key,
+	data_evento date NOT NULL,
+	motivazione varchar(30) NOT NULL,
+	data_guarigione date,
+	missione positive_integer references missione on delete restrict on update cascade,
+	membro positive_integer references membro on delete restrict on update cascade,
+	check (data_guarigione > data_evento),
+	UNIQUE(missione,data_evento, membro)
+);
+
+create table decesso(
+	membro positive_integer primary key references membro on delete restrict on update cascade,
+	missione positive_integer references missione on delete restrict on update cascade,
+	data_decesso date NOT NULL,
+	motivazione varchar(30) NOT NULL
+);
+
+create table realizzazione_corrente(
+	team positive_integer primary key references team on delete restrict on update cascade ,
+	missione_di_campo positive_integer references missione_di_campo 
+	on delete restrict on update cascade NOT NULL, 
+	data_inizio_attività date NOT NULL
+);
+
+create table realizzazione_passata(
+	team positive_integer primary key references team on delete restrict on update cascade,
+	missione_di_campo positive_integer references missione_di_campo 
+	on delete restrict on update cascade NOT NULL, 
+	data_inizio_attività date NOT NULL,
+	data_fine_attività date NOT NULL,
+	check (data_fine_attività > data_inizio_attività)
+	
+);
+
+create table missione_esplorativa(
+	missione positive_integer primary key references missione on delete restrict on update cascade,
+	esito boolean default NULL,
+	team positive_integer references team on delete restrict on update cascade NOT NULL UNIQUE
+);
+
+create table autorizzazione(
+	missione_esplorativa positive_integer references missione_esplorativa 
+	on delete restrict on update cascade,
+	missione_di_campo positive_integer references missione_di_campo 
+	on delete restrict on update cascade,
+	primary key (missione_esplorativa,missione_di_campo)
+);
+
+/*Inserimento emergenze*/
+insert into emergenza values (1,'Maremoto ocenao Indiano', 'raccolta fondi e interventi in prima linea per salvare vittime del maremoto', '2004-12-26', '2005-10-12' , 8);
+insert into emergenza values (2,'Assistenza Rifugiati Kenya', 'fornire assistenza ai rifugiati, ai tossicodipendenti e alle vittime di violenza', '2017-02-03', NULL, 4);
+insert into emergenza values (3,'Epidemia in Guinea', 'epidemia di morbillo che ha portato alla morte di migliaia di bambini', '2017-02-08', NULL , 6);
+insert into emergenza values (4,'Assistenza in guerra Haiti ', 'le crescenti tensioni hanno messo a dura prova tutti gli aspetti dell''assistenza medica ad Haiti', '2018-01-01',NULL, 7);
+insert into emergenza values (5,'Epidemia in Burundi', 'risoluzione di gravi epidemie di malaria e colera in Burundi', '2019-01-01',NULL , 5);
+insert into emergenza values (6,'Spose bambine', 'allarme violazione diritti dei bambini', '2019-12-26', NULL , 8);
+insert into emergenza values (7,'Malnutrizione dello Yemen', 'tassi di malnutrizione  più alti mai registrati', '2020-01-01',NULL , 7);
+insert into emergenza values (8,'Epidemia COVID-19', 'epidemia con tasso di contaggio e di diffusione geografica più alto nella storia', '2020-01-01', NULL , 9);
+
+/*Inserimento luoghi in cui si svolgono le emergenze*/
+insert into luogo values ('Kenya');
+insert into luogo values ('Haiti');
+insert into luogo values ('Burundi');
+insert into luogo values ('Yemen');
+insert into luogo values ('Guinea');
+insert into luogo values ('Belgio');
+insert into luogo values ('Siria');
+insert into luogo values ('Spagna');
+insert into luogo values ('Oceano Indiano');
+
+/*Associazione luogo con emergenza*/
+insert into coinvolgimento values (1, 'Oceano Indiano');
+insert into coinvolgimento values (2, 'Kenya');
+insert into coinvolgimento values (3, 'Guinea');
+insert into coinvolgimento values (4, 'Haiti');
+insert into coinvolgimento values (5, 'Burundi');
+insert into coinvolgimento values (6, 'Yemen');
+insert into coinvolgimento values (7, 'Yemen');
+insert into coinvolgimento values (8, 'Belgio');
+insert into coinvolgimento values (8, 'Siria');
+insert into coinvolgimento values (8, 'Spagna');
+
+/*Associazione luogo con luogo specifico*/
+insert into luogo_specifico values('Nairobi' , 'Kenya');
+insert into luogo_specifico values('Homa Bay' , 'Kenya');  
+insert into luogo_specifico values('Kiambu' , 'Kenya');
+insert into luogo_specifico values('Mathare' , 'Kenya'); 
+insert into luogo_specifico values('Port-au-Prince' , 'Haiti');
+insert into luogo_specifico values('Port-à-Piment' , 'Haiti');
+insert into luogo_specifico values('Kinyinya' , 'Burundi');
+insert into luogo_specifico values('Bujumbura' , 'Burundi');
+insert into luogo_specifico values('Taiz' , 'Yemen');
+insert into luogo_specifico values('Conakry' , 'Guinea'); 
+insert into luogo_specifico values('Bruxelles' , 'Belgio'); 
+insert into luogo_specifico values('Damasco' , 'Siria'); 
+insert into luogo_specifico values('Barcellone' , 'Spagna'); 
+insert into luogo_specifico values('Aceh' , 'Oceano Indiano'); 
+insert into luogo_specifico values('Sana''a' , 'Yemen');  
+
+/*Inserimento sezioni*/
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Italia' , 2,12);
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Belgio' , 6,100);
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Brasile' , 7,120);
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Spagna' , 3,151);
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Francia' , 7,246);
+insert into sezione(sede,numero_di_uffici, numero_membri) values ('Giappone' , 3,40);
+
+
+
+/*Inserimento membri con relativa specializzazione in dipendente o volontario*/
+insert into membro values (1,'MRSMTT99P18H703U','ingegnere' , 'mattia', 'marseglia' , '1991-09-28' , 'de gaspare' , '20' ,'84023', 'Italia');
+insert into dipendente values (1,1000,1);
+
+insert into membro values (2,'12487542691','ingegnere' , 'vito', 'turi' , '1979-11-10' , 'Rue du Berger' , '240' ,'1047', 'Belgio');
+insert into dipendente values (2,3500,7);
+
+insert into membro values (3,'891-40-8025','dottore' , 'camilla', 'spingola' , '1992-12-18' , 'Angel Torres' , '1' ,'2300', 'Brasile');
+insert into dipendente values (3,3200,4);
+
+insert into membro values (4,'9999999L','artigiano' , 'nando', 'sica' , '1974-09-17' , 'Paseo del Prado' , '99' ,'84553', 'Spagna');
+insert into volontario values(4, '2019-01-01' , '2022-12-31');
+
+insert into membro values (5,'ALFRSS99P18H703U','esperto logistico' , 'alfredo', 'rossi' , '1989-09-28' , 'de gaspare' , '20' ,'84023', 'Italia');
+insert into dipendente values (5,1500,7);
+
+insert into membro values (6,'11487542691','dottore' , 'maria', 'geltrude' , '1979-11-10' , 'Rue du Berger' , '240' ,'1047', 'Belgio');
+insert into dipendente values (6,6750,15);
+
+insert into membro values (7,'861-40-8025','amministratore' , 'pierfrancesco', 'benincasa' , '1996-12-18' , 'Angel Torres' , '1' ,'2300', 'Brasile');
+insert into dipendente values (7,10000,2);
+
+insert into membro values (8,'39999999L','dottore' , 'francesco', 'servidio' , '1969-09-17' , 'Paseo del Prado' , '99' ,'84553', 'Spagna');
+insert into dipendente values (8,7500,30);
+
+insert into membro values (9,'LRNCPN72P18H703U','infermiere' , 'Lorenzo', 'Capon' , '1972-04-21' , 'Via Partenope' , '42' ,'74010', 'Italia');
+insert into dipendente values (9,800,10);
+
+insert into membro values (10,'12487782691','ingegnere' , 'vito', 'turi' , '1978-11-10' , 'Rue du Berger' , '240' ,'1047', 'Belgio');
+insert into dipendente values (10,10000,12);
+
+insert into membro values (11,'891-41-8025','esperto logistico' , 'Rose', 'T. Buckner' , '1978-10-11' , 'Rua Operários Campistas' , '970' ,'28030-255', 'Brasile');
+insert into dipendente values (11,10000,7);
+
+insert into membro values (12,'99754999L','esperto logistico' , 'Jacqueline', 'B. Rego' , '1968-11-8' , 'Cádiz' , '43' ,'18500', 'Spagna');
+insert into dipendente values (12,6500,20);
+
+insert into membro values (13,'SBNZTC68P18H703U','figura medica' , 'Sabina', 'Zetticci' , '1968-11-8' , 'piazza pilastri' , '24' ,'23855', 'Italia');
+insert into dipendente values (13,100,15);
+
+insert into membro values (14,'11487582691','pompiere' , 'Hannah', 'Byrne' , '1984-08-2' , 'Avenue des Sartiaux' , '182' ,'55470', 'Belgio');
+insert into volontario values(14, '2018-01-01' , '2021-12-31');
+
+insert into membro values (15,'861-41-8025','dottore' , 'Peggy', 'D. Bryant' , '1991-04-21' , 'Estrada da Gama' , '1971' ,'26035-651', 'Brasile');
+insert into dipendente values (15,2475,5);
+
+insert into membro values (16,'39997599L','pompiere' , 'Cirilla', 'Baresi' , '1975-01-29' , 'Avda. de la Estación' , '93' ,'28649', 'Spagna');
+insert into volontario values(16, '2019-01-01' , '2022-12-31');
+
+insert into membro values (17,'861-31-8125','infermiere' , 'Marvin', 'K. Alfonso' , '1958-08-26' , 'Estrada Ecologica' , '211' ,'83328-200', 'Brasile');
+insert into dipendente values (17,10000,20);
+
+insert into membro values (18,'11487582781','agente di polizia' , 'Nichol', 'DDtuker' , '1975-01-29' , 'Avda. de la Estación' , '93' ,'28649', 'Belgio');
+insert into volontario values(18, '2020-01-01' , '2022-12-31');
+
+insert into membro values (19,'861-11-8025','esperto logistico' , 'Luis', 'Ferreira melo' , '1981-10-15' , 'Rua Sebastiao Mori' , '1561' ,'29010-398', 'Brasile');
+insert into dipendente values (19,8000,9);
+
+insert into membro values (20,'321156789345','bartender' , 'Millard', 'Croquetaigne' , '1971-02-18' , 'Rue De Geneve' , '12' ,'94140', 'Francia');
+insert into volontario values(20, '2020-01-01' , '2022-12-31');
+
+insert into membro values (21,'331456789345','ingegnere' , 'Tilly', 'Bleer' , '1965-05-03' , 'Avenue Millies LaCroix' , '56' ,'95600', 'Francia');
+insert into dipendente values (21,15000,20);
+
+insert into membro values (22,'11487582631','guardacoste' , 'Sierk', 'Booi' , '1972-07-29' , 'Langestraat' , '159' ,'6040', 'Belgio');
+insert into volontario values(22, '2020-01-01' , '2022-12-31');
+
+insert into membro values (23,'123451789124','amministratore' , 'Tsuguhiko', 'Yokoi' , '1989-10-24' , 'Jūkyo Hyōji' , '92' ,'100-8994', 'Giappone');
+insert into dipendente values (23,15000,5);
+
+insert into membro values (24,'123456719124','brand manager' , 'Kazuyasu', 'Hori' , '1958-10-29' , 'Yaesu, Chuo-ku' , '1-5-3' ,'100-8994', 'Giappone');
+insert into volontario values(24, '2020-01-01' , '2022-12-31');
+
+insert into membro values (25,'123156789124','dottore' , 'Yuukou', 'Niiya' , '1959-11-09' , 'Yaesu 1-ChomeChuo-ku' , '5-3' ,'100-8994', 'Giappone');
+insert into dipendente values (25,450,12);
+
+insert into membro values (26,'223456789124','insegnante' , 'Kazuno', 'Kawahara' , '1965-09-18' , 'Hyogo-ken, Kobe-shi, Minami-ku' , '3-20' ,'650-0487', 'Giappone');
+insert into volontario values(26, '2021-01-01' , '2022-12-31');
+
+insert into membro values (27,'523456789124','editor' , 'Shizuo', 'Shimizu' , '1991-09-13' , 'Hakusanura, Chuo Ward' , '62-46' ,'951-8131', 'Giappone');
+insert into volontario values(27, '2019-01-01' , '2022-12-31');
+
+insert into membro values (28,'923456789124','figura medica' , 'Takashishifu', 'Zumorito' , '1958-10-29' , 'sukiguma, Hakata Ward, Fukuoka' , '21-5' ,'812-0858', 'Giappone');
+insert into dipendente values (28,10000,25);
+
+insert into membro values (29,'913456789124','elettricista' , 'Matteo-San', 'Chang' , '1974-03-29' , 'Nanbanaka, Naniwa Ward, Osaka' , '67-46' ,'556-0011', 'Giappone');
+insert into volontario values(29, '2021-01-01' , '2022-12-31');
+
+insert into membro values (30,'321446781345','dottore' , 'La Roux', 'Monty' , '1964-7-26' , 'rue de la Hulotais' , '40' ,'83700', 'Francia');
+insert into dipendente values (30,10000,14);
+
+insert into membro values (31,'11484542691','elettricista' , 'Boukje','den Exter' , '1950-10-14' , 'Linieweg' , '278' ,'8340', 'Belgio');
+insert into volontario values(31, '2021-01-01' , '2021-12-31');
+
+insert into membro values (32,'861-44-8025','amministratore' , 'Emilly' , 'Carvalho Dias' , '1994-04-18' , 'Rua Lacerda Coutinho' , '1498' ,'22041-030', 'Brasile');
+insert into dipendente values (32,3500,2);
+
+insert into membro values (33,'39999499L','insegnante' , 'Jasmine' ,'Matías Zavala' , '1987-07-30' , 'Avda. Los llanos' , '37' ,'26258', 'Spagna');
+insert into volontario values(33, '2020-01-01' , '2022-12-31');
+
+insert into membro values (34,'LRNCPN70P18H703U','infermiere' , 'Cesarina', 'Bellucci' , '1970-01-19' , 'Via degli Aldobrandeschi' , '122' ,'09039', 'Italia');
+insert into dipendente values (34,100,10);
+
+insert into membro values (35,'12487784691','insegnante' , 'Arvid' ,' Nelissen ' , '1968-04-24' , 'Rue du Pont Simon ' , '76' ,'9400', 'Belgio');
+insert into volontario values(35, '2021-01-01' , '2021-12-31');
+
+insert into membro values (36,'891-41-4025','esperto logistico' , 'Sofia' , ' Pereira Araujo', '1978-10-11' , 'Rua Doutor Dorinato Limas' , '1422' ,'35680-215', 'Brasile');
+insert into dipendente values (36,4785,7);
+
+insert into membro values (37,'99774994L','amministratore' , 'Rafel', 'Abreu López' , '1968-11-8' , 'Reyes Católicos' , '40' ,'09500', 'Spagna');
+insert into dipendente values (37,3001,24);
+
+insert into membro values (38,'SBNZTN68P18H703U','figura medica' , 'Boris', 'Fiorentini' , '1968-11-8' , 'Piazzetta Scalette Rubiani' , '114' ,'84029', 'Italia');
+insert into dipendente values (38,100,15);
+
+insert into membro values (39,'11484482691','pompiere' , 'Jeppe', 'A. Kristoffersen' , '1997-12-31' , 'Rue Supexhe ' , '239' ,'5521', 'Belgio');
+insert into volontario values(39, '2018-01-01' , '2021-12-31');
+
+insert into membro values (40,'861-45-8025','dottore' , 'Manuela', 'Almeida Azevedo' , '1952-01-16' , 'Rua Nicolau Soares da Silva' , '1265' ,'86044-030', 'Brasile');
+insert into dipendente values (40,25000,5);
+
+insert into membro values (41,'11487452691','pompiere' , 'Zeb ','van der Jagt' , '1957-07-12' , 'Rue du Monument ' , '469' ,'5537', 'Belgio');
+insert into volontario values(41, '2021-01-01' , '2021-12-31');
+
+insert into membro values (42,'861-40-8525','amministratore' , 'Caio' , 'Dias Cardoso' , '1989-03-24' , 'Avenida Franca' , '641' ,'74354-320', 'Brasile');
+insert into dipendente values (42,10000,2);
+
+insert into membro values (43,'39999559L','artigiano' , 'Hersilia' ,'Zapata Zúñiga' , '1971-07-04' , 'Comandante Izarduy' , '54' ,'08920', 'Spagna');
+insert into volontario values(43, '2021-01-01' , '2022-12-31');
+
+insert into membro values (44,'LRNCPN02P18H703U','infermiere' , 'Geraldo', 'Calabrese' , '1989-04-09' , 'Via Nolana' , '38' ,'19035', 'Italia');
+insert into dipendente values (44,100,10);
+
+insert into membro values (45,'12487552691','agente di polizia' , 'Jan-Paul ' ,' Sieben ' , '1968-04-24' , 'Boulevard General Wahis ' , '102' ,'5300', 'Belgio');
+insert into volontario values(45, '2019-01-01' , '2021-12-31');
+
+insert into membro values (46,'891-55-8025','esperto logistico' , 'Melissa' , 'Melo Rodrigues', '1988-01-20' , 'Rua Rio Branco' , '1606' ,'77808-380', 'Brasile');
+insert into dipendente values (46,300,2);
+
+insert into membro values (47,'9974559L','chef' , 'Nerón', 'Mateo Almonte' , '1981-08-13' , 'C/ Hijuela de Lojo' , '89' ,'20240', 'Spagna');
+insert into volontario values(47, '2019-01-01' , '2022-12-31');
+
+insert into membro values (48,'SBNZTC93P18H703U','figura medica' , 'Fulvio', 'Rizzo' , '1993-12-25' , 'Piazza Guglielmo Pepe' , '50' ,'62011', 'Italia');
+insert into dipendente values (48,1000,15);
+
+insert into membro values (49,'11487585691','pompiere' , 'Michal', 'Verstappen' , '1967-07-20' , 'Lodorp' , '212' ,'1360', 'Belgio');
+insert into volontario values(49, '2018-01-01' , '2021-12-31');
+
+insert into membro values (50,'861-41-5425','dottore' , 'Miguel', 'Foz do Iguaçu-PR' , '1991-02-16' , 'Rua José Correia de Lima' , '892' ,'85862-246', 'Brasile');
+insert into dipendente values (50,6874,5);
+
+
+/*inserimento domicilio e relativa correlazione con il membro tramite recapito */
+insert into domicilio values (1,'via alberta' , '20', '00043');
+insert into recapito values (1, 1);
+
+insert into domicilio values (2,'rue de ransart' , '12', '6220');
+insert into recapito values (2, 2);
+
+insert into domicilio values (3,'R. Joaquim Curado' , '94', '69055-744');
+insert into recapito values (3, 3);
+
+insert into domicilio values (4,'Calle Ceramica' , '4', '45520');
+insert into recapito values (4, 4);
+
+insert into domicilio values (5,'via geltruda' , '99', '30043');
+insert into recapito values (5, 5);
+
+insert into domicilio values (6,'Boie de L''octroi' , '15', '4877');
+insert into recapito values (6, 6);
+
+insert into domicilio values (7,'AV. Paraiba' , '1015', '69057-021');
+insert into recapito values (7, 7);
+
+insert into domicilio values (8,'Calle Sta. Rosa' , '7', '30430');
+insert into recapito values (8, 8);
+
+insert into domicilio values (9,'via fratelli' , '21', '84025');
+insert into recapito values (9, 9);
+
+insert into domicilio values (10,'Vlinderstraat' , '16', '3940');
+insert into recapito values (10, 10);
+
+insert into domicilio values (11,'R. Jutica' , '1', '69099-201');
+insert into recapito values (11, 11);
+
+insert into domicilio values (12,'Calle Fuero' , '13', '24001');
+insert into recapito values (12, 12);
+
+insert into domicilio values (13,'via palumbo' , '124', '84025');
+insert into recapito values (13, 13);
+
+insert into domicilio values (14,'ZandWege' , '43', '8000');
+insert into recapito values (14, 14);
+
+insert into domicilio values (15,'R.Natal' , '470', '69057-090');
+insert into recapito values (15, 15);
+
+insert into domicilio values (16,'Calle Somera' , '2', '26133');
+insert into recapito values (16, 16);
+
+insert into domicilio values (17,'Estrada Ecologica' , '211' ,'83328-200');
+insert into recapito values (17, 17);
+
+insert into domicilio values (18,'Avda. de la Estación' , '93' ,'28649');
+insert into recapito values (18, 18);
+
+insert into domicilio values (19,'Rua Sebastiao Mori' , '1561' ,'29010-398');
+insert into recapito values (19, 19);
+
+insert into domicilio values (20,'Rue De Geneve' , '12' ,'94140');
+insert into recapito values (20, 20);
+
+insert into domicilio values (21,'Avenue Millies LaCroix' , '56' ,'95600');
+insert into recapito values (21, 21);
+
+insert into domicilio values (22,'Langestraat' , '159' ,'6040');
+insert into recapito values (22, 22);
+
+insert into domicilio values (23,'Jūkyo Hyōji' , '92' ,'100-8994');
+insert into recapito values (23, 23);
+
+insert into domicilio values (24,'Yaesu, Chuo-ku' , '1-5-3' ,'100-8994');
+insert into recapito values (24, 24);
+
+insert into domicilio values (25,'Yaesu 1-ChomeChuo-ku' , '5-3' ,'100-8994');
+insert into recapito values (25, 25);
+
+insert into domicilio values (26,'Hyogo-ken, Kobe-shi, Minami-ku' , '3-20' ,'650-0487');
+insert into recapito values (26, 26);
+
+insert into domicilio values (27,'Hakusanura, Chuo Ward' , '62-46' ,'951-8131');
+insert into recapito values (27, 27);
+
+insert into domicilio values (28,'sukiguma, Hakata Ward, Fukuoka' , '21-5' ,'812-0858');
+insert into recapito values (28, 28);
+
+insert into domicilio values (29,'Nanbanaka, Naniwa Ward, Osaka' , '67-46' ,'556-0011');
+insert into recapito values (29, 29);
+
+insert into domicilio values (30,'rue de la Hulotais' , '40' ,'83700');
+insert into recapito values (30, 30);
+
+insert into domicilio values (31,'Linieweg' , '278' ,'8340');
+insert into recapito values (31, 31);
+
+insert into domicilio values (32,'Rua Lacerda Coutinho' , '1498' ,'22041-030');
+insert into recapito values (32, 32);
+
+insert into domicilio values (33,'Avda. Los llanos' , '37' ,'26258');
+insert into recapito values (33, 33);
+
+insert into domicilio values (34,'Via degli Aldobrandeschi' , '122' ,'09039');
+insert into recapito values (34, 34);
+
+insert into domicilio values (35,'Rue du Pont Simon ' , '76' ,'9400');
+insert into recapito values (35,35);
+
+insert into domicilio values (36,'Rua Doutor Dorinato Limas' , '1422' ,'35680-215');
+insert into recapito values (36, 36);
+
+insert into domicilio values (37,'Reyes Católicos' , '40' ,'09500');
+insert into recapito values (37, 37);
+
+insert into domicilio values (38,'Piazzetta Scalette Rubiani' , '114' ,'84029');
+insert into recapito values (38, 38);
+
+insert into domicilio values (39,'Rue Supexhe ' , '239' ,'5521');
+insert into recapito values (39, 39);
+
+insert into domicilio values (40,'Rua Nicolau Soares da Silva' , '1265' ,'86044-030');
+insert into recapito values (40, 40);
+
+insert into domicilio values (41,'Rue du Monument ' , '469' ,'5537');
+insert into recapito values (41, 41);
+
+insert into domicilio values (42,'Avenida Franca' , '641' ,'74354-320');
+insert into recapito values (42, 42);
+
+insert into domicilio values (43, 'Comandante Izarduy' , '54' ,'08920');
+insert into recapito values (43, 43);
+
+insert into domicilio values (44, 'Via Nolana' , '38' ,'19035');
+insert into recapito values (44, 44);
+
+insert into domicilio values (45,'Boulevard General Wahis ' , '102' ,'5300');
+insert into recapito values (45, 45);
+
+insert into domicilio values (46,'Rua Rio Branco' , '1606' ,'77808-380');
+insert into recapito values (46, 46);
+
+insert into domicilio values (47,'C/ Hijuela de Lojo' , '89' ,'20240');
+insert into recapito values (47, 47);
+
+insert into domicilio values (48,'Piazza Guglielmo Pepe' , '50' ,'62011');
+insert into recapito values (48, 48);
+
+insert into domicilio values (49,'Lodorp' , '212' ,'1360');
+insert into recapito values (49, 49);
+
+insert into domicilio values (50,'Rua José Correia de Lima' , '892' ,'85862-246');
+insert into recapito values (50, 50);
+
+/*Esempio di membro che ha più domicili*/
+insert into recapito values (2,4);
+insert into recapito values (4,6);
+
+/*Inserimento di qualifiche richieste da MSF*/
+insert into qualifica values('Diploma liceale');
+insert into qualifica values('Laurea magistrale');
+insert into qualifica values('Laurea Triennale');
+insert into qualifica values('Master di secondo livello');
+insert into qualifica values('Master di primo livello');
+insert into qualifica values('dottorato di ricerca');
+
+/*Associazione membro con qualifica*/
+insert into specializzazione values (1, 'Master di secondo livello');
+insert into specializzazione values (1, 'Master di primo livello');
+insert into specializzazione values (2, 'dottorato di ricerca');
+insert into specializzazione values (3, 'Laurea Triennale');
+insert into specializzazione values (3, 'Laurea magistrale');
+insert into specializzazione values (4, 'Diploma liceale');
+insert into specializzazione values (5, 'Master di secondo livello');
+insert into specializzazione values (5, 'Master di primo livello');
+insert into specializzazione values (6, 'dottorato di ricerca');
+insert into specializzazione values (7, 'Laurea Triennale');
+insert into specializzazione values (7, 'Laurea magistrale');
+insert into specializzazione values (8, 'Diploma liceale');
+insert into specializzazione values (15, 'Master di secondo livello');
+insert into specializzazione values (16, 'Master di primo livello');
+insert into specializzazione values (13, 'dottorato di ricerca');
+insert into specializzazione values (13, 'Laurea Triennale');
+insert into specializzazione values (15, 'Laurea magistrale');
+insert into specializzazione values (12, 'Diploma liceale');
+insert into specializzazione values (9, 'Master di secondo livello');
+insert into specializzazione values (9, 'Master di primo livello');
+insert into specializzazione values (8, 'dottorato di ricerca');
+insert into specializzazione values (11, 'Laurea Triennale');
+insert into specializzazione values (14, 'Master di primo livello');
+insert into specializzazione values (11, 'Laurea magistrale');
+insert into specializzazione values (10, 'Diploma liceale');
+insert into specializzazione values (10, 'Laurea magistrale');
+insert into specializzazione values (17, 'Laurea Triennale');
+insert into specializzazione values (17, 'Laurea magistrale');
+insert into specializzazione values (18, 'Diploma liceale');
+insert into specializzazione values (18, 'dottorato di ricerca');
+insert into specializzazione values (19, 'dottorato di ricerca');
+insert into specializzazione values (19, 'Master di secondo livello');
+insert into specializzazione values (20, 'Master di primo livello');
+insert into specializzazione values (20, 'Laurea magistrale');
+insert into specializzazione values (21, 'Laurea magistrale');
+insert into specializzazione values (21, 'Laurea Triennale');
+insert into specializzazione values (22, 'Master di primo livello');
+insert into specializzazione values (23, 'Master di secondo livello');
+insert into specializzazione values (24, 'Master di primo livello');
+insert into specializzazione values (25, 'Laurea magistrale');
+insert into specializzazione values (26, 'Laurea Triennale');
+insert into specializzazione values (27, 'dottorato di ricerca');
+insert into specializzazione values (28, 'Master di primo livello');
+insert into specializzazione values (28, 'Diploma liceale');
+insert into specializzazione values (29, 'Master di secondo livello');
+insert into specializzazione values (29, 'Diploma liceale');
+insert into specializzazione values (30, 'Diploma liceale');
+insert into specializzazione values (30, 'Master di primo livello');
+insert into specializzazione values (31, 'Laurea Triennale');
+insert into specializzazione values (32, 'Laurea magistrale');
+insert into specializzazione values (33, 'Laurea magistrale');
+insert into specializzazione values (34, 'Laurea magistrale');
+insert into specializzazione values (34, 'Diploma liceale');
+insert into specializzazione values (35, 'Diploma liceale');
+insert into specializzazione values (35, 'Laurea Triennale');
+insert into specializzazione values (36, 'Master di secondo livello');
+insert into specializzazione values (50, 'Master di primo livello');
+insert into specializzazione values (40, 'dottorato di ricerca');
+insert into specializzazione values (37, 'Laurea Triennale');
+insert into specializzazione values (39, 'Laurea magistrale');
+insert into specializzazione values (38, 'Diploma liceale');
+insert into specializzazione values (49, 'Master di secondo livello');
+insert into specializzazione values (42, 'Master di primo livello');
+insert into specializzazione values (41, 'dottorato di ricerca');
+insert into specializzazione values (47, 'Laurea Triennale');
+insert into specializzazione values (48, 'Laurea magistrale');
+insert into specializzazione values (45, 'Diploma liceale');
+insert into specializzazione values (44, 'Master di secondo livello');
+insert into specializzazione values (46, 'Master di primo livello');
+insert into specializzazione values (43, 'dottorato di ricerca');
+
+------------ MISSIONI ---------------------
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(1,'2004-12-29' , '2005-04-15' , 'supporto medico alle vittime del maremoto', 1);
+insert into svolgimento values ('Aceh' , 'Oceano Indiano' , 1);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(2,'2005-01-20' , '2005-05-01' , 'interventi di ricostruzione delle strutture ', 1);
+insert into svolgimento values ('Aceh' , 'Oceano Indiano' , 2);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(3,'2017-02-10' , '2018-02-10' , 'trattamento malattie croniche', 2);
+insert into svolgimento values ('Nairobi' , 'Kenya' , 3);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(4,'2017-03-01' , '2018-03-11' , 'trattamento malati di HIV', 2);
+insert into svolgimento values ('Homa Bay' , 'Kenya' , 4);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(5,'2017-04-09' , '2018-04-10' , 'trattamento tossicodipendenti', 2);
+insert into svolgimento values ('Kiambu' , 'Kenya' , 5);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(6,'2017-04-09' , '2018-02-10' , 'trattamento centro traumatologico', 2);
+insert into svolgimento values ('Mathare' , 'Kenya' , 6);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(7,'2017-05-01','2018-05-10' , 'costruzione ospedale da campo per offrire cure alle vittime', 3);
+insert into svolgimento values ('Conakry' , 'Guinea' , 7);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(8,'2017-09-08','2018-12-10','interventi di vaccinazione per emarginare l''epidemia di morbillo', 3);
+insert into svolgimento values ('Conakry' , 'Guinea', 8);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(9,'2018-01-07' , '2018-05-31' , 'possibilità di apertura ospedale traumatologico ', 4);
+insert into svolgimento values ('Port-au-Prince' , 'Haiti' , 9);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(10,'2018-02-01' , '2019-12-31' , 'costruzione ospedale traumatologico', 4);
+insert into svolgimento values ('Port-au-Prince' , 'Haiti' , 10);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(11,'2018-03-01' , '2019-12-31' , 'Servizi di emeregnza e maternità', 4);
+insert into svolgimento values ('Port-à-Piment' , 'Haiti' , 11);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(12,'2019-01-04' , '2020-12-31' , 'trattamento di colera', 5);
+insert into svolgimento values ('Kinyinya' , 'Burundi' , 12);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(13,'2019-01-04' , '2020-12-31' , 'centri saluta pubblica', 5);
+insert into svolgimento values ('Bujumbura' , 'Burundi' ,13);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(14,'2020-01-15' , '2020-03-15' , 'valutazione della gravità e tentativo di sensibilizzazione', 6);
+insert into svolgimento values ('Sana''a' , 'Yemen' , 14);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza) -- esplo
+values(15,'2020-03-30','2020-07-10','valutazione possibilità di intervento per arginare il fenomeno', 7);
+insert into svolgimento values ('Taiz' , 'Yemen' , 15);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(16,'2020-02-28' , '2021-11-15' ,'intervento per la tutela dei diritti dei minori', 6);
+insert into svolgimento values ('Sana''a' , 'Yemen' , 16);
+/* La missione 15 non avrà esito positivo di conseguenza la missione di campo 17 non verrà mai creata
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(17,'2020-04-01','2020-11-10','distribuzione proventi per supporto economico alla popolazione', 7);
+insert into svolgimento values ('Taiz' , 'Yemen' , 17);*/
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(18,'2020-04-01' , '2020-12-10' , 'interventi medici per fronteggiare l''epidemia di COVID-19', 8);
+insert into svolgimento values ('Bruxelles' , 'Belgio' , 18);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(19,'2020-05-01' , '2021-01-10' , 'supporto medico per arginare il contagio di COVID-19', 8);
+insert into svolgimento values ('Damasco' , 'Siria' , 19);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(20,'2020-10-01','2021-07-10','Supporto medico per fronteggiare il COVID-19', 8);
+insert into svolgimento values ('Barcellone' , 'Spagna' , 20);
+
+insert into missione(codice_missione,data_di_inizio,data_fine_presunta,descrizione,emergenza)
+values(21,'2021-03-10','2021-09-15','costruzione ospedali e supporto medico alla popolazione', 7);
+insert into svolgimento values ('Taiz' , 'Yemen' , 21);
+
+/* Inserimento capo missione */
+insert into capo_missione values (1);
+insert into capo_missione values (3);
+insert into capo_missione values (5);
+insert into capo_missione values (9);
+insert into capo_missione values (11);
+insert into capo_missione values (13);
+insert into capo_missione values (15);
+insert into capo_missione values (17);
+insert into capo_missione values (19);
+insert into capo_missione values (21);
+insert into capo_missione values (23);
+insert into capo_missione values (25);
+insert into capo_missione values (28);
+insert into capo_missione values (30);
+insert into capo_missione values (32);
+insert into capo_missione values (34);
+insert into capo_missione values (36);
+insert into capo_missione values (38);
+insert into capo_missione values (40);
+insert into capo_missione values (42);
+insert into capo_missione values (44);
+insert into capo_missione values (46);
+insert into capo_missione values (48);
+insert into capo_missione values (50);
+
+/*missione 1 */
+insert into team(codice_team ,capo_missione) values (1,17);
+insert into missione_di_campo values (1,'supporto vittime del maremoto' , 'medico' , 7);
+insert into realizzazione_corrente values(1, 1, '2004-12-29');
+insert into partecipazione_corrente values ('2004-12-29' , 17 , 1);
+insert into partecipazione_corrente values ('2004-12-29' , 18 , 1);
+insert into partecipazione_corrente values ('2004-12-29' , 20 , 1);
+insert into partecipazione_corrente values ('2004-12-29' , 22 , 1);
+insert into coordinamento values(1,18, 'associativo');
+
+/*missione 2 */
+insert into team(codice_team ,capo_missione) values (2,21);
+insert into missione_di_campo values (2,'ristrutturazione edifici' , 'ingegneristico' , 4);
+insert into realizzazione_corrente values(2, 2, '2005-02-20');
+insert into partecipazione_corrente values ('2005-02-20' , 21 , 2);
+insert into partecipazione_corrente values ('2005-02-20' , 28 , 2);
+insert into partecipazione_corrente values ('2005-02-20' , 26 , 2);
+insert into partecipazione_corrente values ('2005-02-20' , 31 , 2);
+insert into partecipazione_corrente values ('2005-04-21' , 29 , 2);
+insert into coordinamento values(2,28, 'associativo');
+
+/*fine emergenza 1 */
+insert into realizzazione_passata values(1, 1, '2004-12-29' , '2005-04-15');
+insert into report values (1 , 100000 , 9 , NULL , '2005-04-15');
+insert into evento_saliente(nome,missione) values ('ritrovate persone disperse' , 1);
+
+insert into realizzazione_passata values(2, 2, '2005-02-20' , '2005-05-01');
+insert into report values (2 , 100000 , 9 , NULL , '2005-05-01');
+insert into evento_saliente(nome,missione) values ('completati edifici' , 2);
+
+/*missione 3 */
+insert into team(codice_team ,capo_missione) values (3,17);
+insert into missione_di_campo values (3 ,'gestione dei pazienti' , 'gestione' , 2);
+insert into realizzazione_corrente values(3 , 3, '2017-02-10');
+insert into partecipazione_corrente values ('2017-02-10' , 17 , 3);
+insert into partecipazione_corrente values ('2017-02-10' , 6 , 3);
+insert into partecipazione_corrente values ('2017-03-20' , 8 , 3);
+insert into partecipazione_corrente values ('2017-03-20' , 26 , 3);
+insert into coordinamento values(3,6, 'finanziario');
+
+/*fine missione 3*/
+insert into realizzazione_passata values(3, 3, '2017-02-10' , '2018-02-10');
+insert into report values (3 , 100000 , 9 , NULL , '2018-02-10');
+
+insert into evento_saliente(nome,missione) values ('riogranizzazione struttura ospedaliera' , 3);
+
+/*missione 4 */
+insert into team values(4,9);
+insert into missione_di_campo values(4,'medicinali malati di HIV','consegna medicinale',4);
+insert into realizzazione_corrente values (4,4, '2017-03-01');
+insert into partecipazione_corrente values ('2017-03-01' , 9 , 4);
+insert into partecipazione_corrente values ('2017-03-01' , 10 , 4);
+insert into partecipazione_corrente values ('2017-03-01' , 12 , 4);
+insert into partecipazione_corrente values ('2017-07-20' , 21 , 4);
+insert into partecipazione_corrente values ('2017-07-20' , 13 , 4);
+
+/*fine missione 4*/
+insert into realizzazione_passata values(4, 4, '2017-03-01' , '2018-03-11');
+insert into report values (4 , 100000 , 3 , NULL , '2018-03-11');
+insert into evento_saliente(nome,missione) values ('arrivo medicinali per HIV' , 4);
+
+/*missione 5*/
+insert into team values(5,11);
+insert into missione_di_campo values(5,'medicinali tossicodipendenti','consegna medicinale',6);
+insert into realizzazione_corrente values (5,5, '2017-04-09');
+insert into partecipazione_corrente values ('2017-04-09' , 11 , 5);
+insert into partecipazione_corrente values ('2017-04-09' , 15 , 5);
+insert into partecipazione_corrente values ('2017-05-25' , 18 , 5);
+insert into partecipazione_corrente values ('2017-05-25' , 20 , 5);
+insert into coordinamento values(5,15, 'risorse umane');
+
+/*fine missione 5 */
+insert into realizzazione_passata values(5, 5, '2017-04-09' , '2018-04-10');
+insert into report values (5 , 100000 , 4 , NULL , '2018-04-10');
+insert into evento_saliente(nome,missione) values ('perdita di medicinali' , 5);
+
+/*missione 6*/
+insert into team values(6,48);
+insert into missione_di_campo values(6,'medicinali traumatologici','consegna medicinale',6);
+insert into realizzazione_corrente values (6,6,'2017-04-09');
+insert into partecipazione_corrente values ('2017-04-09' , 48 , 6);
+insert into partecipazione_corrente values ('2017-04-09' , 31 , 6);
+insert into partecipazione_corrente values ('2017-05-09' , 34 , 6);
+insert into partecipazione_corrente values ('2017-05-09' , 27 , 6);
+insert into partecipazione_corrente values ('2017-04-09' , 37 , 6);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2017-04-10', 'bombardamento' , 6,27);
+insert into decesso values (48,6,'2017-04-10','bombardamento');
+insert into decesso values (37,6,'2017-04-10','bombardamento');
+update ferimento set data_guarigione = '2017-10-15' where data_evento = '2017-04-10' and membro = 27;
+
+/*fine missione 6*/
+insert into realizzazione_passata values(6, 6, '2017-04-09' , '2018-02-10');
+insert into report values (6 , 100000 , 4 , NULL , '2018-02-10');
+insert into evento_saliente(nome,missione) values ('attacco terroristico' , 6);
+
+/*missione 7*/
+insert into team(codice_team ,capo_missione) values (7,5);
+insert into missione_di_campo values(7,'costruzione ospedale','ingegneristico',3);
+insert into realizzazione_corrente values (7,7,'2017-05-10');
+insert into partecipazione_corrente values ('2017-05-10' , 16, 7);
+insert into partecipazione_corrente values ('2017-05-10' , 13, 7);
+insert into partecipazione_corrente values ('2017-05-10' , 2, 7);
+insert into partecipazione_corrente values ('2017-05-10' , 4, 7);
+insert into partecipazione_corrente values ('2017-05-10' , 5, 7);
+insert into coordinamento values(7,16, 'finanziario');
+insert into coordinamento values(7,2, 'risorse umane');
+
+/*fine missione 7*/
+insert into realizzazione_passata values(7, 7, '2017-05-10' , '2018-05-10');
+insert into report values (7 , 100000 , 7 , NULL , '2018-05-10');
+insert into evento_saliente(nome,missione) values ('aperta parte della struttura' , 7);
+
+/*Missione 8*/
+insert into team(codice_team ,capo_missione) values (8,30);
+insert into missione_di_campo values(8,'vaccinazione contro morbillo','medico',3);
+insert into realizzazione_corrente values (8,8,'2017-09-08');
+insert into partecipazione_corrente values ('2017-09-08' , 30, 8);
+insert into partecipazione_corrente values ('2017-09-08' , 31, 8);
+insert into partecipazione_corrente values ('2017-10-08' , 26, 8);
+insert into partecipazione_corrente values ('2017-10-08' , 28, 8);
+insert into partecipazione_corrente values ('2017-10-08' , 2, 8);
+insert into partecipazione_corrente values ('2017-10-08' , 3, 8);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2017-11-10', 'accoltellamento' , 8,28);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2017-11-10', 'accoltellamento' , 8,26);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2017-11-10', 'accoltellamento' , 8,31);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2017-11-10', 'accoltellamento' , 8,30);
+
+update ferimento set data_guarigione = '2017-11-15' where data_evento = '2017-11-10' and membro = 28;
+update ferimento set data_guarigione = '2017-11-15' where data_evento = '2017-11-10' and membro = 26;
+update ferimento set data_guarigione = '2018-02-03' where data_evento = '2017-11-10' and membro = 31;
+update ferimento set data_guarigione = '2018-02-03' where data_evento = '2017-11-10' and membro = 30;
+
+/*fine missione 8 */
+insert into realizzazione_passata values(8, 8, '2017-09-08' , '2018-12-10');
+insert into report values (8 , 100000 , 6 , NULL , '2018-12-10');
+insert into evento_saliente(nome,missione) values ('attacco terroristico' , 8);
+insert into evento_saliente(nome,missione) values ('rallentamento vaccinazioni' , 8);
+insert into evento_saliente(nome,missione) values ('arrivo truppe militari' , 8);
+
+/*missione 9 */
+insert into team(codice_team ,capo_missione) values (9,40);
+insert into missione_esplorativa(missione,team) values (9, 9);
+insert into partecipazione_corrente values ('2018-01-07' , 40, 9);
+insert into partecipazione_corrente values ('2018-01-07' , 41, 9);
+insert into partecipazione_corrente values ('2018-01-07' , 45, 9);
+insert into coordinamento values(9,41, 'associativo');
+
+/*aggiornamento esito della missione esplorativa e aggiunta report */
+update missione_esplorativa set esito = true where (missione = 9);
+insert into report values (9 , 5000 ,5 , 'missione completata con successo' , '2018-05-10');
+
+/*missione 10*/
+insert into missione_di_campo values(10,'costruzione ospedale','ingegneristico',3);
+insert into autorizzazione values(9,10);
+insert into team values (10,44);
+insert into realizzazione_corrente values (10,10,'2018-02-01');
+insert into partecipazione_corrente values ('2018-02-01' , 44, 10);
+insert into partecipazione_corrente values ('2018-02-01' , 46, 10);
+insert into partecipazione_corrente values ('2018-02-01' , 47, 10);
+insert into partecipazione_corrente values ('2018-02-01' , 49, 10);
+insert into partecipazione_corrente values ('2018-02-01' , 50, 10);
+insert into partecipazione_corrente values ('2018-02-01' , 29, 10);
+insert into coordinamento values(10,47, 'associativo');
+insert into coordinamento values(10,50, 'finanziario');
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2018-05-15', 'contusione alla gamba' , 10,46);
+update ferimento set data_guarigione = '2018-05-30' where data_evento = '2018-05-15' and membro = 46;
+
+/*fine missione 10*/
+insert into realizzazione_passata values(10, 10, '2018-02-01' , '2019-12-31');
+insert into report values (10 , 100000 , 4 , NULL , '2019-12-31');
+insert into evento_saliente(nome,missione) values ('crollo di parte della struttura' , 10);
+
+/*missione 11*/
+insert into team(codice_team ,capo_missione) values (11,19);
+insert into missione_di_campo values(11,'tutela maternità','medico',3);
+insert into realizzazione_corrente values (11,11,'2018-03-01');
+insert into partecipazione_corrente values ('2018-03-01' , 19, 11);
+insert into partecipazione_corrente values ('2018-03-01' , 33, 11);
+insert into partecipazione_corrente values ('2018-03-01' , 25, 11);
+insert into partecipazione_corrente values ('2018-03-01' , 35, 11);
+insert into partecipazione_corrente values ('2018-03-01' , 24, 11);
+insert into partecipazione_corrente values ('2018-03-01' , 23, 11);
+insert into coordinamento values(11,33, 'associativo');
+insert into coordinamento values(11,24, 'risorse umane');
+
+/*fine missione 11*/
+insert into realizzazione_passata values(11, 11, '2018-03-01' , '2019-12-31');
+insert into report values (11 , 100000 , 7 , NULL , '2019-12-31');
+
+/*missione 12*/
+insert into team(codice_team ,capo_missione) values (12,28);
+insert into missione_di_campo values(12,'trattamento per colera','medico',5);
+insert into realizzazione_corrente values (12,12,'2019-01-04');
+insert into partecipazione_corrente values ('2019-01-04' , 17, 12);
+insert into partecipazione_corrente values ('2019-01-04' , 22, 12);
+insert into partecipazione_corrente values ('2019-01-04' , 28, 12);
+insert into partecipazione_corrente values ('2019-01-04' , 36, 12);
+insert into partecipazione_corrente values ('2019-01-04' , 18, 12);
+insert into partecipazione_corrente values ('2019-01-04' , 11, 12);
+insert into coordinamento values(12,28, 'associativo');
+insert into coordinamento values(12,22, 'risorse umane');
+
+/*fine missione 12*/
+insert into realizzazione_passata values(12, 12, '2019-01-04' , '2020-12-31');
+insert into report values (12 , 100000 , 7 , NULL , '2020-12-31');
+insert into evento_saliente(nome,missione) values ('arrivo antidolorifici' , 12);
+
+/*missione 13*/
+insert into team(codice_team ,capo_missione) values (13,34);
+insert into missione_di_campo values(13,'centri salute pubblica','medico',5);
+insert into realizzazione_corrente values (13,13,'2019-01-04');
+insert into partecipazione_corrente values ('2019-01-04' , 34, 13);
+insert into partecipazione_corrente values ('2019-01-04' , 31, 13);
+insert into partecipazione_corrente values ('2019-01-04' , 12, 13);
+insert into partecipazione_corrente values ('2019-01-04' , 14, 13);
+insert into partecipazione_corrente values ('2019-01-04' , 8, 13);
+insert into coordinamento values(13,31, 'associativo');
+insert into coordinamento values(13,12, 'risorse umane');
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2019-03-04', 'sparato alla spalla' , 13,12);
+update ferimento set data_guarigione = '2019-06-30' where data_evento = '2019-03-04' and membro = 12;
+
+/*fine missione 13*/
+insert into realizzazione_passata values(13, 13, '2019-01-04' , '2020-12-31');
+insert into report values (13 , 100000 , 5 , NULL , '2020-12-31');
+insert into evento_saliente(nome,missione) values ('attacco da parte di un soggetto malintenzionato' , 13);
+
+/*missione 14*/
+insert into team(codice_team ,capo_missione) values (14,28);
+insert into missione_esplorativa(missione,team) values (14, 14);
+insert into partecipazione_corrente values ('2020-01-15' , 28, 14);
+insert into partecipazione_corrente values ('2020-01-15' , 26, 14);
+insert into partecipazione_corrente values ('2020-01-15' , 41, 14);
+insert into partecipazione_corrente values ('2020-01-15' , 43, 14);
+insert into coordinamento values(14,41, 'associativo');
+
+/*aggiornamento esito della missione esplorativa e aggiunta report */
+update missione_esplorativa set esito = true where (missione = 14);
+insert into report values (14 , 5000 ,5 , 'Situazione analizzata con anticipo' , '2020-02-15');
+
+
+/*missione 15*/
+insert into team(codice_team ,capo_missione) values (15,28);
+insert into missione_esplorativa(missione,team) values (15, 15);
+insert into partecipazione_corrente values ('2020-03-30' , 28, 15);
+insert into partecipazione_corrente values ('2020-03-30' , 26, 15);
+insert into partecipazione_corrente values ('2020-03-30' , 41, 15);
+insert into partecipazione_corrente values ('2020-03-30' , 43, 15);
+insert into coordinamento values(15,41, 'associativo');
+
+/*aggiornamento esito della missione esplorativa e aggiunta report */
+update missione_esplorativa set esito = false where (missione = 15);
+insert into report values (15 , 5000 ,5 , 'valutazione conclusa in anticipo' , '2020-05-10');
+insert into evento_saliente(nome,missione) values ('rientro anticipato dei membri' , 15);
+
+/*missione 16*/
+insert into team(codice_team ,capo_missione) values (16,19);
+insert into missione_di_campo values(16,'tutela diritti minori','sociale',5);
+insert into autorizzazione values(14,16);
+insert into realizzazione_corrente values (16,16,'2020-02-28');
+insert into partecipazione_corrente values ('2020-02-28' , 19, 16);
+insert into partecipazione_corrente values ('2020-02-28' , 49, 16);
+insert into partecipazione_corrente values ('2020-02-28' , 33, 16);
+insert into partecipazione_corrente values ('2020-03-30' , 20, 16);
+insert into partecipazione_corrente values ('2020-03-30' , 23, 16);
+insert into coordinamento values(16,33, 'associativo');
+insert into coordinamento values(16,49, 'risorse umane');
+
+delete from partecipazione_corrente where membro = 23 and data_inizio = '2020-03-30';
+insert into partecipazione_passata values ('2020-03-30' , 23, 16, '2020-07-21');
+
+/*fine missione 16*/
+insert into realizzazione_passata values(16, 16, '2020-02-28' , '2021-11-15');
+insert into report values (16, 100000 , 5 , NULL , '2021-11-15');
+insert into evento_saliente(nome,missione) values ('ottenimento della prima legge per la tutela' , 16);
+
+/*missione 17 non autorizzata da missione esplorativa 15*/
+
+/*missione 18 */
+insert into team(codice_team ,capo_missione) values (17,15);
+insert into missione_di_campo values(18,'epidemia COVID 19','medico',5);
+insert into realizzazione_corrente values (17,18,'2020-04-01');
+insert into partecipazione_corrente values ('2020-04-01' , 15, 17);
+insert into partecipazione_corrente values ('2020-04-01' , 16, 17);
+insert into partecipazione_corrente values ('2020-04-01' , 27,17);
+insert into partecipazione_corrente values ('2020-04-01' , 50, 17);
+insert into partecipazione_corrente values ('2020-04-01' , 44, 17);
+insert into coordinamento values(17,16 ,'associativo');
+insert into coordinamento values(17,27 ,'risorse umane');
+
+insert into team(codice_team ,capo_missione) values (18,32);
+insert into realizzazione_corrente values (18,18,'2020-05-10');
+insert into partecipazione_corrente values ('2020-05-10' , 32,18);
+insert into partecipazione_corrente values ('2020-05-10' , 38, 18);
+insert into partecipazione_corrente values ('2020-05-10' , 39, 18);
+insert into partecipazione_corrente values ('2020-06-01' , 42, 18);
+insert into partecipazione_corrente values ('2020-06-01' , 1, 18);
+insert into coordinamento values(18,38, 'associativo');
+insert into coordinamento values(18,39, 'risorse umane');
+
+
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2020-05-04', 'trauma cranico' , 18,16);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2020-05-04', 'sparato alla gamba' , 18,27);
+insert into ferimento(data_evento,motivazione,missione,membro) 
+values ('2020-05-04', 'sparato ad una mano' , 18,50);
+update ferimento set data_guarigione = '2020-07-30' where data_evento = '2020-05-04' and membro = 16;
+update ferimento set data_guarigione = '2020-08-14' where data_evento = '2020-05-04' and membro = 27;
+update ferimento set data_guarigione = '2020-08-15' where data_evento = '2020-05-04' and membro = 50;
+
+/*fine missione 18*/
+insert into realizzazione_passata values(17, 18, '2020-04-01' , '2020-11-10');
+insert into realizzazione_passata values(18, 18, '2020-05-10' , '2020-11-10');
+insert into report values (18 , 100000 , 5 , NULL , '2020-11-10');
+
+/*missione 19*/
+insert into team(codice_team ,capo_missione) values (19,9);
+insert into missione_di_campo values(19,'epidemia COVID 19','medico',5);
+insert into realizzazione_corrente values (19,19,'2020-05-01');
+insert into partecipazione_corrente values ('2020-05-01' , 9, 19);
+insert into partecipazione_corrente values ('2020-05-01' , 14,19);
+insert into partecipazione_corrente values ('2020-05-01' , 43, 19);
+insert into partecipazione_corrente values ('2020-05-01' , 10, 19);
+insert into partecipazione_corrente values ('2020-05-01' , 30, 19);
+insert into coordinamento values(19,14, 'associativo');
+insert into coordinamento values(19,43, 'risorse umane');
+
+/*fine missione 19*/
+insert into realizzazione_passata values(19, 19, '2020-05-01' , '2021-01-10');
+insert into report values (19 , 100000 , 5 , NULL , '2021-01-10');
+insert into evento_saliente(nome,missione) values ('arrivo primi vaccini sperimentali' , 19);
+
+/*missione 20*/
+insert into team(codice_team ,capo_missione) values (20,21);
+insert into missione_di_campo values(20,'epidemia COVID 19','medico',5);
+insert into realizzazione_corrente values (20,20,'2020-10-01');
+insert into partecipazione_corrente values ('2020-10-01' , 21, 20);
+insert into partecipazione_corrente values ('2020-10-01' , 26, 20);
+insert into partecipazione_corrente values ('2020-10-01' , 41, 20);
+insert into partecipazione_corrente values ('2020-11-01' , 5, 20);
+insert into partecipazione_corrente values ('2020-11-01' , 7, 20);
+insert into coordinamento values(20,26, 'associativo');
+insert into coordinamento values(20,41, 'risorse umane');
+
+/*missione 21*/
+insert into team(codice_team ,capo_missione) values (21,17);
+insert into missione_di_campo values(21,'costruzione ospedali','ingegneristico',5);
+insert into realizzazione_corrente values (21,21,'2021-03-10');
+insert into partecipazione_corrente values ('2021-03-10' , 17,21);
+insert into partecipazione_corrente values ('2021-03-10' , 31, 21);
+insert into partecipazione_corrente values ('2021-03-10' , 33, 21);
+insert into partecipazione_corrente values ('2021-04-10' , 4, 21);
+insert into partecipazione_corrente values ('2021-04-10' , 2, 21);
+insert into coordinamento values(21,31, 'associativo');
+insert into coordinamento values(21,33, 'risorse umane');
+
+
+

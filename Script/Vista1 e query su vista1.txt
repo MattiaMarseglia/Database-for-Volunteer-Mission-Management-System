@@ -1,0 +1,44 @@
+
+--VISTA: MembriAttualmenteDisponibili
+
+
+
+
+CREATE VIEW MembriAttualmenteDisponibili(codice_membro, professione, nome, cognome, data_di_nascita, sezione_di_appartenenza, anni_di_servizio, data_inizio_disponibilità, data_fine_disponibilità, ruolo) AS
+SELECT M.codice_membro, professione, nome, cognome, data_di_nascita, sezione, anni_di_servizio, data_inizio_disponibilità, data_fine_disponibilità,
+	CASE
+		WHEN anni_di_servizio IS NULL THEN 'volontario'
+		ELSE 'dipendente'
+	END AS ruolo
+FROM membro M LEFT JOIN dipendente D ON M.codice_membro=D.codice_membro LEFT JOIN volontario V ON M.codice_membro=V.codice_membro
+WHERE (current_date BETWEEN V.data_inizio_disponibilità AND V.data_fine_disponibilità OR anni_di_servizio is not NULL) AND M.codice_membro NOT IN(SELECT membro FROM partecipazione_corrente);
+
+
+
+--POSSIBILI QUERY SU QUESTA VISTA:
+
+
+
+--Membri attualmente disponibili e partecipazioni effettuate:
+
+SELECT codice_membro, professione, nome, cognome, sezione_di_appartenenza, anni_di_servizio, data_inizio_disponibilità, data_fine_disponibilità, ruolo, coalesce (count(distinct(team)), 0) AS numero_partecipazioni
+FROM MembriAttualmenteDisponibili MAD LEFT JOIN partecipazione_passata PP ON MAD.codice_membro = PP.membro
+GROUP BY codice_membro, professione, nome, cognome, sezione_di_appartenenza, anni_di_servizio, data_inizio_disponibilità, data_fine_disponibilità, ruolo;
+
+
+
+--Numero membri disponibili per ogni sezione:
+
+SELECT sezione_di_appartenenza, count(*) numero_membri_disponibili
+FROM MembriAttualmenteDisponibili
+GROUP BY sezione_di_appartenenza;
+
+
+
+
+--Dipendenti e volontari esperti disponibili:
+
+SELECT codice_membro, professione, nome, cognome, data_di_nascita, sezione_di_appartenenza, anni_di_servizio, data_inizio_disponibilità, data_fine_disponibilità, ruolo
+FROM MembriAttualmenteDisponibili
+WHERE (ruolo='dipendente' AND anni_di_servizio>=5) OR (ruolo='volontario'AND (extract(year from data_fine_disponibilità )- extract(year from data_inizio_disponibilità))>=2 AND codice_membro IN (SELECT membro FROM partecipazione_passata))
+order by codice_membro;

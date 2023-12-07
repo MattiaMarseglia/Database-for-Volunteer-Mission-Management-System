@@ -1,0 +1,507 @@
+<Project name="Gruppo 12 - Schema ER">
+<ConceptualSchema>
+<Entity name="Emergenza" X="-1167" Y="606" >
+<Attribute name="codice_emergenza" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="descrizione" type="varchar" minCard="1" maxCard="1" length="200"/>
+<Attribute name="data_di_inizio" type="date" minCard="0" maxCard="1"/>
+<Attribute name="data_di_fine" type="date" minCard="0" maxCard="1"/>
+<Attribute name="gravita" type="integer" minCard="1" maxCard="1"/>
+<Identifier name="ID0" attributes="codice_emergenza"/>
+</Entity>
+<Entity name="Missione" X="-681" Y="223" >
+<Attribute name="codice_missione" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="data_di_inizio" type="date" minCard="1" maxCard="1"/>
+<Attribute name="data_fine_presunta" type="date" minCard="1" maxCard="1"/>
+<Attribute name="descrizione" type="varchar" minCard="1" maxCard="1" length="200"/>
+<Attribute name="num_membri_coinvolti" type="integer" minCard="1" maxCard="1"/>
+<Identifier name="ID1" attributes="codice_missione"/>
+</Entity>
+<Entity name="Missione di campo" X="-395" Y="517" >
+<Attribute name="obiettivo" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="tipologia" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="valutazione_rischio" type="numeric" minCard="1" maxCard="1" length="2" precision="0"/>
+</Entity>
+<Entity name="Team" X="-127" Y="914" >
+<Attribute name="codice_team" type="integer" minCard="1" maxCard="1"/>
+<Identifier name="ID4" attributes="codice_team"/>
+</Entity>
+<Entity name="Volontario" X="1177" Y="643" >
+<Attribute name="data_inizio_disponibilita" type="date" minCard="1" maxCard="1"/>
+<Attribute name="data_fine_disponibilita" type="date" minCard="1" maxCard="1"/>
+</Entity>
+<Relationship name="Gestione" X="403" Y="913">
+</Relationship>
+<Entity name="Capo Missione" X="864" Y="921" >
+</Entity>
+<Entity name="Membro" X="927" Y="149" >
+<Attribute name="codice_membro" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="national_identity_number" type="varchar" minCard="1" maxCard="1" length="25"/>
+<Attribute name="professione" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="cognome" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="data_nascita" type="date" minCard="1" maxCard="1"/>
+<Attribute name="via" type="varchar" minCard="0" maxCard="1" length="30"/>
+<Attribute name="civico" type="varchar" minCard="0" maxCard="1" length="5"/>
+<Attribute name="cap" type="varchar" minCard="0" maxCard="1" length="15"/>
+<Identifier name="ID7" attributes="codice_membro"/>
+</Entity>
+<Entity name="Partecipazione corrente" X="362" Y="568" >
+<Attribute name="data_inizio" type="date" minCard="1" maxCard="1"/>
+<Identifier name="ID5a" attributes="data_inizio"/>
+</Entity>
+<Entity name="Partecipazione passata" X="234" Y="353" >
+<Attribute name="data_inizio" type="date" minCard="1" maxCard="1"/>
+<Attribute name="data_fine" type="date" minCard="1" maxCard="1"/>
+<Identifier name="ID5b" attributes="data_inizio"/>
+</Entity>
+<Relationship name="M-P" X="651" Y="359">
+</Relationship>
+<Relationship name="P-T" X="39" Y="362">
+</Relationship>
+<Relationship name="M-Pcor" X="720" Y="479">
+</Relationship>
+<Entity name="Sezione" X="1298" Y="-75" >
+<Attribute name="sede" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="numero_di_uffici" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="num_membri" type="integer" minCard="1" maxCard="1"/>
+<Identifier name="ID2" attributes="sede"/>
+</Entity>
+<Relationship name="Appartenenza" X="1357" Y="252">
+</Relationship>
+<Entity name="Missione esplorativa" X="-800" Y="547" >
+<Attribute name="esito" type="boolean" minCard="0" maxCard="1"/>
+</Entity>
+<Entity name="Dipendente" X="801" Y="628" >
+<Attribute name="stipendio" type="numeric" minCard="1" maxCard="1" length="7" precision="2"/>
+<Attribute name="anni_di_servizio" type="integer" minCard="1" maxCard="1"/>
+</Entity>
+<Entity name="Report" X="-1369" Y="-28" >
+<Attribute name="costo_totale" type="numeric" minCard="1" maxCard="1" length="8" precision="2"/>
+<Attribute name="successo_o_insuccesso" type="numeric" minCard="1" maxCard="1" length="1" precision="0"/>
+<Attribute name="motivazione_variazione_data" type="varchar" minCard="0" maxCard="1" length="100"/>
+</Entity>
+<Relationship name="Autorizzazione" X="-597" Y="545">
+</Relationship>
+<Relationship name="Conclusione" X="-934" Y="-1">
+<Attribute name="data_fine_effettiva" type="date" minCard="1" maxCard="1"/>
+</Relationship>
+<Relationship name="Realizzazione passata" X="-252" Y="684">
+<Attribute name="data_inizio_attivita" type="date" minCard="1" maxCard="1"/>
+<Attribute name="data_fine_attivita" type="date" minCard="1" maxCard="1"/>
+</Relationship>
+<Relationship name="Realizzazione corrente" X="-505" Y="684">
+<Attribute name="data_inizio_attivita" type="date" minCard="1" maxCard="1"/>
+</Relationship>
+<Relationship name="Risoluzione" X="-1094" Y="398">
+</Relationship>
+<Relationship name="Coordinamento" X="-59" Y="213">
+<Attribute name="tipo" type="varchar" minCard="1" maxCard="1" length="30"/>
+</Relationship>
+<Relationship name="Decesso" X="64" Y="73">
+<Attribute name="data_decesso" type="date" minCard="1" maxCard="1"/>
+<Attribute name="motivazione" type="varchar" minCard="1" maxCard="1" length="30"/>
+</Relationship>
+<Entity name="Ferimento" X="53" Y="-98" >
+<Attribute name="codice_ferimento" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="data_evento" type="date" minCard="1" maxCard="1"/>
+<Attribute name="motivazione" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="data_guarigione" type="date" minCard="0" maxCard="1"/>
+<Identifier name="ID9" attributes="codice_ferimento"/>
+</Entity>
+<Relationship name="Mi-F" X="-576" Y="-75">
+</Relationship>
+<Relationship name="F-Me" X="1065" Y="-74">
+</Relationship>
+<Relationship name="Realizzazione eplorativa" X="-820" Y="674">
+</Relationship>
+<Relationship name="Coinvolgimento" X="-1392" Y="652">
+</Relationship>
+<Relationship name="Svolgimento" X="-1203" Y="392">
+</Relationship>
+<Relationship name="Collocazione Geografica" X="-1417" Y="385">
+</Relationship>
+<Entity name="Luogo Specifico" X="-1431" Y="230" >
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="20"/>
+<Identifier name="ID14" attributes="nome"/>
+</Entity>
+<Entity name="Luogo" X="-1424" Y="514" >
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="20"/>
+<Identifier name="ID15" attributes="nome"/>
+</Entity>
+<Relationship name="Dati Missione esplorativa" X="-817" Y="428">
+</Relationship>
+<Relationship name="Dati Missione di Campo" X="-360" Y="413">
+</Relationship>
+<Relationship name="P-Tcor" X="83" Y="570">
+</Relationship>
+<Relationship name="D-C-P" X="878" Y="785">
+</Relationship>
+<Relationship name="Dati Dipendente" X="851" Y="508">
+</Relationship>
+<Relationship name="Dati Volontario" X="1222" Y="516">
+</Relationship>
+<Entity name="Evento Saliente" X="-2594" Y="193" >
+<Attribute name="codice_evento" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="100"/>
+<Identifier name="ID18" attributes="codice_evento"/>
+</Entity>
+<Relationship name="Accadimento" X="-2143" Y="202">
+</Relationship>
+<Entity name="Qualifica" X="1674" Y="353" >
+<Attribute name="titolo" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Identifier name="ID19" attributes="titolo"/>
+</Entity>
+<Relationship name="Specializzazione" X="1368" Y="350">
+</Relationship>
+<Entity name="Domicilio" X="1655" Y="518" >
+<Attribute name="codice_domicilio" type="integer" minCard="1" maxCard="1"/>
+<Attribute name="via_domicilio" type="varchar" minCard="1" maxCard="1" length="30"/>
+<Attribute name="civico_domicilio" type="varchar" minCard="1" maxCard="1" length="5"/>
+<Attribute name="cap_domicilio" type="varchar" minCard="1" maxCard="1" length="15"/>
+<Identifier name="ID20" attributes="codice_domicilio"/>
+</Entity>
+<Relationship name="Recapito" X="1448" Y="500">
+</Relationship>
+<RelLink name="RelLink0" X="733" Y="478" relationship="Gestione" entity="Capo Missione" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="601" Y="670" relationship="Gestione" entity="Team" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="771" Y="87" relationship="M-P" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="473" Y="651" relationship="P-T" entity="Team" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="377" Y="375" relationship="M-Pcor" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1290" Y="156" relationship="M-Pcor" entity="Partecipazione corrente" minCard="1" maxCard="1" idName="ID5a"/>
+<RelLink name="RelLink0" X="419" Y="449" relationship="Appartenenza" entity="Sezione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="624" Y="448" relationship="Appartenenza" entity="Membro" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="-173" Y="976" relationship="Conclusione" entity="Report" minCard="1" maxCard="1" idName="ID8"/>
+<RelLink name="RelLink0" X="-12" Y="466" relationship="Realizzazione passata" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="-176" Y="745" relationship="Realizzazione corrente" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="54" Y="-73" relationship="Risoluzione" entity="Emergenza" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="-215" Y="128" relationship="Risoluzione" entity="Missione" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="-369" Y="313" relationship="Autorizzazione" entity="Missione di campo" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="-841" Y="627" relationship="Autorizzazione" entity="Missione esplorativa" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="-28" Y="324" relationship="Conclusione" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1087" Y="358" relationship="Coordinamento" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1121" Y="628" relationship="Coordinamento" entity="Team" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="313" Y="122" relationship="Decesso" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="203" Y="150" relationship="Decesso" entity="Missione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="141" Y="36" relationship="Mi-F" entity="Missione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="306" Y="32" relationship="Mi-F" entity="Ferimento" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="614" Y="103" relationship="F-Me" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="-404" Y="658" relationship="Realizzazione corrente" entity="Missione di campo" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="-334" Y="655" relationship="Realizzazione passata" entity="Missione di campo" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="-434" Y="747" relationship="Realizzazione eplorativa" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="-651" Y="632" relationship="Realizzazione eplorativa" entity="Missione esplorativa" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="-782" Y="655" relationship="Coinvolgimento" entity="Emergenza" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="-957" Y="252" relationship="Svolgimento" entity="Missione" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="-871" Y="442" relationship="Svolgimento" entity="Luogo Specifico" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="-1357" Y="334" relationship="Collocazione Geografica" entity="Luogo Specifico" minCard="1" maxCard="1" idName="ID14"/>
+<RelLink name="RelLink0" X="-887" Y="613" relationship="Coinvolgimento" entity="Luogo" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="-828" Y="595" relationship="Collocazione Geografica" entity="Luogo" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="-467" Y="365" relationship="Dati Missione di Campo" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="891" Y="494" relationship="Dati Missione di Campo" entity="Missione di campo" minCard="1" maxCard="1" idName="ID17"/>
+<RelLink name="RelLink0" X="754" Y="364" relationship="Dati Missione esplorativa" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="646" Y="502" relationship="Dati Missione esplorativa" entity="Missione esplorativa" minCard="1" maxCard="1" idName="ID16"/>
+<RelLink name="RelLink0" X="1041" Y="442" relationship="P-T" entity="Partecipazione passata" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1134" Y="448" relationship="M-P" entity="Partecipazione passata" minCard="1" maxCard="1" idName="ID5b"/>
+<RelLink name="RelLink0" X="1252" Y="547" relationship="P-Tcor" entity="Partecipazione corrente" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1015" Y="653" relationship="P-Tcor" entity="Team" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1482" Y="599" relationship="D-C-P" entity="Dipendente" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1483" Y="702" relationship="D-C-P" entity="Capo Missione" minCard="1" maxCard="1" idName="ID10"/>
+<RelLink name="RelLink0" X="1645" Y="436" relationship="Dati Volontario" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1700" Y="552" relationship="Dati Volontario" entity="Volontario" minCard="1" maxCard="1" idName="ID12"/>
+<RelLink name="RelLink0" X="1568" Y="438" relationship="Dati Dipendente" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1514" Y="547" relationship="Dati Dipendente" entity="Dipendente" minCard="1" maxCard="1" idName="ID11"/>
+<RelLink name="RelLink0" X="-420" Y="188" relationship="Accadimento" entity="Evento Saliente" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="-243" Y="193" relationship="Accadimento" entity="Report" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="686" Y="484" relationship="Specializzazione" entity="Qualifica" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="339" Y="461" relationship="Specializzazione" entity="Membro" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="301" Y="494" relationship="Recapito" entity="Membro" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="521" Y="603" relationship="Recapito" entity="Domicilio" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="206" Y="288" relationship="F-Me" entity="Ferimento" minCard="1" maxCard="1"/>
+<Note>
+{\rtf1\ansi
+{\fonttbl\f0\fnil Monospaced;\f1\fnil TimesRoman;}
+{\colortbl\red0\green0\blue0;\red51\green51\blue51;}
+
+\li0\ri0\fi0\f1\fs48\i0\b\ul0\cf1\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\par
+\fs36\par
+\par
+\par
+\fs48\par
+\par
+\par
+\par
+\fs36\par
+\par
+\par
+\li0\ri0\fi0\ul0\par
+}
+
+</Note>
+</ConceptualSchema>
+<RestructuredSchema>
+<Entity name="Emergenza" X="457" Y="357" >
+<Attribute name="codice_emergenza" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="descrizione" type="varchar" minCard="1" maxCard="1" length="200" solved="false"/>
+<Attribute name="data_di_inizio" type="date" minCard="0" maxCard="1" solved="false"/>
+<Attribute name="data_di_fine" type="date" minCard="0" maxCard="1" solved="false"/>
+<Attribute name="gravita" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID0" attributes="codice_emergenza"/>
+<PrimaryIdentifier name="ID0"/>
+</Entity>
+
+<Entity name="Missione" X="634" Y="251" >
+<Attribute name="codice_missione" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_di_inizio" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_fine_presunta" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="descrizione" type="varchar" minCard="1" maxCard="1" length="200" solved="false"/>
+<Attribute name="num_membri_coinvolti" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID1" attributes="codice_missione"/>
+<PrimaryIdentifier name="ID1"/>
+</Entity>
+
+<Entity name="Missione di campo" X="739" Y="357" >
+<Attribute name="obiettivo" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="tipologia" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="valutazione_rischio" type="numeric" minCard="1" maxCard="1" length="2" precision="0" solved="false"/>
+<PrimaryIdentifier name="ID17"/>
+</Entity>
+
+<Entity name="Team" X="868" Y="502" >
+<Attribute name="codice_team" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID4" attributes="codice_team"/>
+<PrimaryIdentifier name="ID4"/>
+</Entity>
+
+<Entity name="Volontario" X="1248" Y="409" >
+<Attribute name="data_inizio_disponibilita" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_fine_disponibilita" type="date" minCard="1" maxCard="1" solved="false"/>
+<PrimaryIdentifier name="ID12"/>
+</Entity>
+
+<Entity name="Capo Missione" X="1172" Y="505" >
+<PrimaryIdentifier name="ID10"/>
+</Entity>
+
+<Entity name="Membro" X="1164" Y="239" >
+<Attribute name="codice_membro" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="national_identity_number" type="varchar" minCard="1" maxCard="1" length="25" solved="false"/>
+<Attribute name="professione" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="cognome" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="data_nascita" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="via" type="varchar" minCard="0" maxCard="1" length="30" solved="false"/>
+<Attribute name="civico" type="varchar" minCard="0" maxCard="1" length="5" solved="false"/>
+<Attribute name="cap" type="varchar" minCard="0" maxCard="1" length="15" solved="false"/>
+<Identifier name="ID7" attributes="codice_membro"/>
+<PrimaryIdentifier name="ID7"/>
+</Entity>
+
+<Entity name="Partecipazione corrente" X="1011" Y="359" >
+<Attribute name="data_inizio" type="date" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID5a" attributes="data_inizio"/>
+<PrimaryIdentifier name="ID5a"/>
+</Entity>
+
+<Entity name="Partecipazione passata" X="968" Y="306" >
+<Attribute name="data_inizio" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_fine" type="date" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID5b" attributes="data_inizio"/>
+<PrimaryIdentifier name="ID5b"/>
+</Entity>
+
+<Entity name="Sezione" X="1287" Y="134" >
+<Attribute name="sede" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="numero_di_uffici" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="num_membri" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Identifier name="ID2" attributes="sede"/>
+<PrimaryIdentifier name="ID2"/>
+</Entity>
+
+<Entity name="Missione esplorativa" X="587" Y="365" >
+<Attribute name="esito" type="boolean" minCard="0" maxCard="1" solved="false"/>
+<PrimaryIdentifier name="ID16"/>
+</Entity>
+
+<Entity name="Dipendente" X="1150" Y="408" >
+<Attribute name="stipendio" type="numeric" minCard="1" maxCard="1" length="7" precision="2" solved="false"/>
+<Attribute name="anni_di_servizio" type="integer" minCard="1" maxCard="1" solved="false"/>
+<PrimaryIdentifier name="ID11"/>
+</Entity>
+
+<Entity name="Report" X="517" Y="141" >
+<Attribute name="costo_totale" type="numeric" minCard="1" maxCard="1" length="8" precision="2" solved="false"/>
+<Attribute name="successo_o_insuccesso" type="numeric" minCard="1" maxCard="1" length="1" precision="0" solved="false"/>
+<Attribute name="motivazione_variazione_data" type="varchar" minCard="0" maxCard="1" length="100" solved="false"/>
+<PrimaryIdentifier name="ID8"/>
+</Entity>
+
+<Entity name="Ferimento" X="893" Y="138" >
+<Attribute name="codice_ferimento" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_evento" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="motivazione" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="data_guarigione" type="date" minCard="0" maxCard="1" solved="false"/>
+<Identifier name="ID9" attributes="codice_ferimento"/>
+<PrimaryIdentifier name="ID9"/>
+</Entity>
+
+<Entity name="Luogo Specifico" X="371" Y="266" >
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="20" solved="false"/>
+<Identifier name="ID14" attributes="nome"/>
+<PrimaryIdentifier name="ID14"/>
+</Entity>
+
+<Entity name="Luogo" X="369" Y="339" >
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="20" solved="false"/>
+<Identifier name="ID15" attributes="nome"/>
+<PrimaryIdentifier name="ID15"/>
+</Entity>
+
+<Entity name="Evento Saliente" X="406" Y="197" >
+<Attribute name="codice_evento" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="nome" type="varchar" minCard="1" maxCard="1" length="100" solved="false"/>
+<Identifier name="ID18" attributes="codice_evento"/>
+<PrimaryIdentifier name="ID18"/>
+</Entity>
+
+<Entity name="Qualifica" X="1416" Y="328" >
+<Attribute name="titolo" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Identifier name="ID19" attributes="titolo"/>
+<PrimaryIdentifier name="ID19"/>
+</Entity>
+
+<Entity name="Domicilio" X="1395" Y="257" >
+<Attribute name="codice_domicilio" type="integer" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="via_domicilio" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+<Attribute name="civico_domicilio" type="varchar" minCard="1" maxCard="1" length="5" solved="false"/>
+<Attribute name="cap_domicilio" type="varchar" minCard="1" maxCard="1" length="15" solved="false"/>
+<Identifier name="ID20" attributes="codice_domicilio"/>
+<PrimaryIdentifier name="ID20"/>
+</Entity>
+
+<Relationship name="Gestione" X="1020" Y="501">
+</Relationship>
+<Relationship name="M-P" X="1084" Y="307">
+</Relationship>
+<Relationship name="P-T" X="916" Y="309">
+</Relationship>
+<Relationship name="M-Pcor" X="1126" Y="358">
+</Relationship>
+<Relationship name="Appartenenza" X="1309" Y="195">
+</Relationship>
+<Relationship name="Autorizzazione" X="668" Y="363">
+</Relationship>
+<Relationship name="Conclusione" X="534" Y="204">
+<Attribute name="data_fine_effettiva" type="date" minCard="1" maxCard="1" solved="false"/>
+</Relationship>
+<Relationship name="Realizzazione passata" X="806" Y="417">
+<Attribute name="data_inizio_attivita" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="data_fine_attivita" type="date" minCard="1" maxCard="1" solved="false"/>
+</Relationship>
+<Relationship name="Realizzazione corrente" X="718" Y="417">
+<Attribute name="data_inizio_attivita" type="date" minCard="1" maxCard="1" solved="false"/>
+</Relationship>
+<Relationship name="Risoluzione" X="482" Y="309">
+</Relationship>
+<Relationship name="Coordinamento" X="874" Y="263">
+<Attribute name="tipo" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+</Relationship>
+<Relationship name="Decesso" X="900" Y="202">
+<Attribute name="data_decesso" type="date" minCard="1" maxCard="1" solved="false"/>
+<Attribute name="motivazione" type="varchar" minCard="1" maxCard="1" length="30" solved="false"/>
+</Relationship>
+<Relationship name="Mi-F" X="672" Y="147">
+</Relationship>
+<Relationship name="F-Me" X="1203" Y="147">
+</Relationship>
+<Relationship name="Realizzazione eplorativa" X="582" Y="416">
+</Relationship>
+<Relationship name="Coinvolgimento" X="379" Y="374">
+</Relationship>
+<Relationship name="Svolgimento" X="510" Y="265">
+</Relationship>
+<Relationship name="Collocazione Geografica" X="371" Y="302">
+</Relationship>
+<Relationship name="Dati Missione esplorativa" X="579" Y="321">
+</Relationship>
+<Relationship name="Dati Missione di Campo" X="752" Y="317">
+</Relationship>
+<Relationship name="P-Tcor" X="946" Y="359">
+</Relationship>
+<Relationship name="D-C-P" X="1177" Y="455">
+</Relationship>
+<Relationship name="Dati Dipendente" X="1166" Y="355">
+</Relationship>
+<Relationship name="Dati Volontario" X="1265" Y="359">
+</Relationship>
+<Relationship name="Accadimento" X="427" Y="147">
+</Relationship>
+<Relationship name="Specializzazione" X="1318" Y="328">
+</Relationship>
+<Relationship name="Recapito" X="1320" Y="266">
+</Relationship>
+<RelLink name="RelLink0" X="1111" Y="509" relationship="Gestione" entity="Capo Missione" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="993" Y="510" relationship="Gestione" entity="Team" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1130" Y="306" relationship="M-P" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1060" Y="318" relationship="M-P" entity="Partecipazione passata" minCard="1" maxCard="1" idName="ID5b"/>
+<RelLink name="RelLink0" X="918" Y="415" relationship="P-T" entity="Team" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="948" Y="318" relationship="P-T" entity="Partecipazione passata" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1191" Y="332" relationship="M-Pcor" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1101" Y="367" relationship="M-Pcor" entity="Partecipazione corrente" minCard="1" maxCard="1" idName="ID5a"/>
+<RelLink name="RelLink0" X="1342" Y="185" relationship="Appartenenza" entity="Sezione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1289" Y="226" relationship="Appartenenza" entity="Membro" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="749" Y="374" relationship="Autorizzazione" entity="Missione di campo" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="657" Y="371" relationship="Autorizzazione" entity="Missione esplorativa" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="585" Y="194" relationship="Conclusione" entity="Report" minCard="1" maxCard="1" idName="ID8"/>
+<RelLink name="RelLink0" X="648" Y="251" relationship="Conclusione" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="887" Y="480" relationship="Realizzazione passata" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="829" Y="408" relationship="Realizzazione passata" entity="Missione di campo" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="845" Y="474" relationship="Realizzazione corrente" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="785" Y="408" relationship="Realizzazione corrente" entity="Missione di campo" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="514" Y="342" relationship="Risoluzione" entity="Emergenza" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="580" Y="301" relationship="Risoluzione" entity="Missione" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1055" Y="287" relationship="Coordinamento" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="913" Y="398" relationship="Coordinamento" entity="Team" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="1087" Y="260" relationship="Decesso" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="843" Y="252" relationship="Decesso" entity="Missione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="694" Y="208" relationship="Mi-F" entity="Missione" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="791" Y="160" relationship="Mi-F" entity="Ferimento" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="1227" Y="202" relationship="F-Me" entity="Membro" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1113" Y="160" relationship="F-Me" entity="Ferimento" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="770" Y="467" relationship="Realizzazione eplorativa" entity="Team" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="622" Y="398" relationship="Realizzazione eplorativa" entity="Missione esplorativa" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="466" Y="389" relationship="Coinvolgimento" entity="Emergenza" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="410" Y="365" relationship="Coinvolgimento" entity="Luogo" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="594" Y="279" relationship="Svolgimento" entity="Missione" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="485" Y="274" relationship="Svolgimento" entity="Luogo Specifico" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="406" Y="292" relationship="Collocazione Geografica" entity="Luogo Specifico" minCard="1" maxCard="1" idName="ID14"/>
+<RelLink name="RelLink0" X="414" Y="330" relationship="Collocazione Geografica" entity="Luogo" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="668" Y="307" relationship="Dati Missione esplorativa" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="612" Y="352" relationship="Dati Missione esplorativa" entity="Missione esplorativa" minCard="1" maxCard="1" idName="ID16"/>
+<RelLink name="RelLink0" X="753" Y="305" relationship="Dati Missione di Campo" entity="Missione" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="789" Y="346" relationship="Dati Missione di Campo" entity="Missione di campo" minCard="1" maxCard="1" idName="ID17"/>
+<RelLink name="RelLink0" X="991" Y="368" relationship="P-Tcor" entity="Partecipazione corrente" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="936" Y="440" relationship="P-Tcor" entity="Team" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1198" Y="446" relationship="D-C-P" entity="Dipendente" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1180" Y="489" relationship="D-C-P" entity="Capo Missione" minCard="1" maxCard="1" idName="ID10"/>
+<RelLink name="RelLink0" X="1220" Y="330" relationship="Dati Dipendente" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1192" Y="390" relationship="Dati Dipendente" entity="Dipendente" minCard="1" maxCard="1" idName="ID11"/>
+<RelLink name="RelLink0" X="1269" Y="331" relationship="Dati Volontario" entity="Membro" minCard="0" maxCard="1"/>
+<RelLink name="RelLink0" X="1290" Y="393" relationship="Dati Volontario" entity="Volontario" minCard="1" maxCard="1" idName="ID12"/>
+<RelLink name="RelLink0" X="461" Y="180" relationship="Accadimento" entity="Evento Saliente" minCard="1" maxCard="1"/>
+<RelLink name="RelLink0" X="495" Y="158" relationship="Accadimento" entity="Report" minCard="0" maxCard="N"/>
+<RelLink name="RelLink0" X="1397" Y="337" relationship="Specializzazione" entity="Qualifica" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="1295" Y="317" relationship="Specializzazione" entity="Membro" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="1288" Y="286" relationship="Recapito" entity="Membro" minCard="1" maxCard="N"/>
+<RelLink name="RelLink0" X="1372" Y="278" relationship="Recapito" entity="Domicilio" minCard="1" maxCard="N"/>
+</RestructuredSchema>
+</Project>

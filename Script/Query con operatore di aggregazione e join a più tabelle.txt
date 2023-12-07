@@ -1,0 +1,23 @@
+/* QUERY 1:
+	Stampa per ogni emergenza:
+		1)il nome e il luogo in cui insiste
+		2)le tipologie di missioni organizzate, e per ogni tipologia 
+			sia il numero di missioni organizzate 
+			sia il numero di missioni concluse */
+
+SELECT
+	E.nome as emergenza,
+	sv.luogo_di_appartenenza as luogo_coinvolto,
+	Mc.Tipologia as tipologia_di_missione_destinata,
+	count(Mc.missione) as numero_missioni_organizzate_per_tipologia,
+	count(R.missione) as numero_missioni_terminate_per_tipologia
+FROM
+	missione_di_campo AS Mc JOIN missione AS M ON Mc.missione=M.codice_missione
+	RIGHT JOIN emergenza AS E ON M.emergenza=E.codice_emergenza
+	LEFT JOIN report AS R ON R.missione = M.codice_missione
+	JOIN svolgimento as sv on sv.missione = M.codice_missione
+GROUP BY 
+	E.codice_emergenza,
+	Mc.Tipologia,sv.luogo_di_appartenenza
+ORDER BY 
+	E.codice_emergenza;

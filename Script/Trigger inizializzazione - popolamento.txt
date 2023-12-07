@@ -1,0 +1,52 @@
+create or replace function incrementa_membri_coinvolti() returns trigger as $$
+begin
+if(exists(select * from realizzazione_corrente where team=new.team)) then
+	update missione
+	set num_membri_coinvolti=num_membri_coinvolti+1 where codice_missione = (select missione_di_campo from realizzazione_corrente where team=new.team);
+else
+	if(exists(select * from missione_esplorativa where team=new.team)) then
+		update missione
+		set num_membri_coinvolti=num_membri_coinvolti+1 where codice_missione = (select missione from missione_esplorativa where team=new.team);
+	else
+		raise exception 'non puoi aggiungere un membro ad un team non in missione';
+	end if;
+end if;
+RETURN new;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+create trigger check_incremento_membri_coinvolti
+after insert on partecipazione_corrente
+for each row execute procedure incrementa_membri_coinvolti();
+
+
+
+create or replace function decrementa_membri_coinvolti() returns trigger as $$
+begin
+if(exists(select * from realizzazione_corrente where team=new.team)) then
+	update missione
+	set num_membri_coinvolti=num_membri_coinvolti-1 where codice_missione = (select missione_di_campo from realizzazione_corrente where team=new.team);
+else
+	if(exists(select * from missione_esplorativa where team=new.team)) then
+		update missione
+		set num_membri_coinvolti=num_membri_coinvolti-1 where codice_missione = (select missione from missione_esplorativa where team=new.team);
+	else
+		update missione
+		set num_membri_coinvolti=num_membri_coinvolti-1 where codice_missione = (select missione_di_campo from realizzazione_passata where team=new.team);
+	end if;
+end if;
+RETURN new;
+END
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+create trigger check_decremento_membri_coinvolti
+after insert on partecipazione_passata
+for each row execute procedure decrementa_membri_coinvolti();
