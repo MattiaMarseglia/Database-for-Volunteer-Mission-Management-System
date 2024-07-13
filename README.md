@@ -1,4 +1,4 @@
-# Medici Senza Frontiere Database Project
+# Medici Senza Frontiere Database Project (PostgreSQL)
 
 <div align="center">
    <img src="imgs/Database_Design.png" alt="Database Design">
