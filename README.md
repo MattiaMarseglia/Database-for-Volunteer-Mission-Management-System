@@ -1,7 +1,7 @@
 # Medici Senza Frontiere Database Project
 
 <div align="center">
-   <img src="Database_Design.png" alt="Database Design">
+   <img src="imgs/Database_Design.png" alt="Database Design">
 </div>
 
 ## Overview
@@ -52,7 +52,7 @@ An in-depth description of the real-world context and requirements for the MSF d
 #### 3.1. Schema Concettuale
 
 <div align="center">
-   <img src="SchemaConcettuale.png" alt="Schema Concettuale">
+   <img src="imgs/SchemaConcettuale.png" alt="Schema Concettuale">
 </div>
 
 #### 3.2. Design Pattern
@@ -76,7 +76,7 @@ An in-depth description of the real-world context and requirements for the MSF d
 #### 4.6. Schema ristrutturato finale
 
 <div align="center">
-   <img src="SchemaRistrutturato.png" alt="Schema Ristrutturato">
+   <img src="imgs/SchemaRistrutturato.png" alt="Schema Ristrutturato">
 </div>
 
 #### 4.7. Schema logico
@@ -84,7 +84,7 @@ An in-depth description of the real-world context and requirements for the MSF d
 #### 4.8. Documentazione dello schema logico
 
 <div align="center">
-   <img src="DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
+   <img src="imgs/DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
 </div>
 
 ### 5. Normalizzazione
