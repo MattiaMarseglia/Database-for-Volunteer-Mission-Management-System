@@ -1,5 +1,9 @@
 # Medici Senza Frontiere Database Project
 
+<div align="center">
+   <img src="Database_Design.png" alt="Database Design">
+</div>
+
 ## Overview
 
 This project involves the design and implementation of a database system for managing the missions of "Medici Senza Frontiere" (MSF), an organization that provides medical assistance in emergencies around the world. The system will handle information about the organization's structure, personnel, volunteers, and missions.
@@ -35,23 +39,66 @@ This project involves the design and implementation of a database system for man
 
 The database will be designed to accommodate the above specifications, ensuring efficient data storage, retrieval, and management.
 
-## Usage
+## Detailed Project Description
 
-Please follow the guidelines below to interact with the database:
+### 1. Descrizione della realtà di interesse
 
-1. **Inserting Data:**
-   - Use the provided forms to input information about new personnel, volunteers, emergency situations, field missions, and exploratory missions.
+An in-depth description of the real-world context and requirements for the MSF database system.
 
-2. **Querying Data:**
-   - Utilize predefined queries to extract specific information about personnel, missions, and emergencies.
+### 2. Analisi delle specifiche
 
-3. **Updating Data:**
-   - If there are changes in personnel details, mission outcomes, or emergency information, use the update forms to modify the records accordingly.
+### 3. Progettazione Concettuale
 
-4. **Reporting:**
-   - Generate reports to assess mission success, personnel involvement, and emergency response effectiveness.
+#### 3.1. Schema Concettuale
+
+<div align="center">
+   <img src="SchemaConcettuale.png" alt="Schema Concettuale">
+</div>
+
+#### 3.2. Design Pattern
+
+#### 3.3. Dizionario dei Dati
+
+#### 3.4. Regole Aziendali
+
+### 4. Progettazione Logica
+
+#### 4.1. Ristrutturazione Schema Concettuale
+
+#### 4.2. Analisi delle ridondanze
+
+#### 4.3. Eliminazione delle generalizzazioni
+
+#### 4.4. Partizionamento/Accorpamento Entità e Associazioni
+
+#### 4.5. Scelta degli identificatori principali
+
+#### 4.6. Schema ristrutturato finale
+
+<div align="center">
+   <img src="SchemaRistrutturato.png" alt="Schema Ristrutturato">
+</div>
+
+#### 4.7. Schema logico
+
+#### 4.8. Documentazione dello schema logico
+
+<div align="center">
+   <img src="DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
+</div>
+
+### 5. Normalizzazione
+
+### 6. Script Creazione e Popolamento Database
+
+### 7. Query SQL
+
+### 8. Viste
+
+### 9. Triggers
 
 ## More Information
-For more detailed information [here](https://github.com/MattiaMarseglia/Volunteer-Mission-Management-System/blob/main/Relazione%20Basi%20di%20Dati%20I-Z%20Gruppo%2012.pdf)
+
+For more detailed information, please refer to the [final project relation document](https://github.com/MattiaMarseglia/Volunteer-Mission-Management-System/blob/main/Relazione%20Basi%20di%20Dati%20I-Z%20Gruppo%2012.pdf).
 
 Feel free to reach out for any clarifications or suggestions. Thank you for your contribution to the "Medici Senza Frontiere" Database Project!
