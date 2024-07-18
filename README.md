@@ -28,6 +28,7 @@ The implemented database aims to store information concerning:
 - **Analisi delle specifiche**
 - **Progettazione Concettuale**:
    - Schema Concettuale
+
       <div align="center">
          <img src="imgs/SchemaConcettuale.png" alt="Schema Concettuale">
       </div>
@@ -41,11 +42,13 @@ The implemented database aims to store information concerning:
    - Partizionamento/Accorpamento Entità e Associazioni
    - Scelta degli identificatori principali
    - Schema ristrutturato finale
+
       <div align="center">
          <img src="imgs/SchemaRistrutturato.png" alt="Schema Ristrutturato">
       </div>
    - Schema logico
    - Documentazione dello schema logico
+
       <div align="center">
          <img src="imgs/DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
       </div>
