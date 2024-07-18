@@ -27,7 +27,7 @@ The implemented database aims to store information concerning:
 - **Descrizione della realtà di interesse**: An in-depth description of the real-world context and requirements for the MSF database system.
 - **Analisi delle specifiche**
 - **Progettazione Concettuale**:
-   - Schema Concettuale
+   - Schema Concettuale:
       <div align="center">
          <img src="imgs/SchemaConcettuale.png" alt="Schema Concettuale">
       </div>
@@ -40,12 +40,12 @@ The implemented database aims to store information concerning:
    - Eliminazione delle generalizzazioni
    - Partizionamento/Accorpamento Entità e Associazioni
    - Scelta degli identificatori principali
-   - Schema ristrutturato finale
+   - Schema ristrutturato finale:
       <div align="center">
          <img src="imgs/SchemaRistrutturato.png" alt="Schema Ristrutturato">
       </div>
    - Schema logico
-   - Documentazione dello schema logico
+   - Documentazione dello schema logico:
       <div align="center">
          <img src="imgs/DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
       </div>
