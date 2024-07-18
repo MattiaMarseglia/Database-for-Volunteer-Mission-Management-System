@@ -38,7 +38,7 @@ The implemented database aims to store information concerning:
    - Dizionario dei Dati
    - Regole Aziendali
 
--**Progettazione Logica**:
+- **Progettazione Logica**:
    - Ristrutturazione Schema Concettuale
    - Analisi delle ridondanze
    - Eliminazione delle generalizzazioni
