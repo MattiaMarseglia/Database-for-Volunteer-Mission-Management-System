@@ -25,9 +25,9 @@ The implemented database aims to store information concerning:
 -**Database Schema**: The database will be designed to accommodate the above specifications, ensuring efficient data storage, retrieval, and management.
 
 ## Design and Implementation Steps
--**Descrizione della realtà di interesse**: An in-depth description of the real-world context and requirements for the MSF database system.
--**Analisi delle specifiche**:
--**Progettazione Concettuale**:
+- **Descrizione della realtà di interesse**: An in-depth description of the real-world context and requirements for the MSF database system.
+- **Analisi delle specifiche**:
+- **Progettazione Concettuale**:
    - Schema Concettuale
 
 <div align="center">
@@ -57,11 +57,11 @@ The implemented database aims to store information concerning:
    <img src="imgs/DocumentazioneSchemaLogico.png" alt="Documentazione Schema Logico">
 </div>
 
--**Normalizzazione**
--**Script Creazione e Popolamento Database**
--**Query SQL**
--**Viste**
--**Triggers**
+- **Normalizzazione**
+- **Script Creazione e Popolamento Database**
+- **Query SQL**
+- **Viste**
+- **Triggers**
 
 ## More Information
 
